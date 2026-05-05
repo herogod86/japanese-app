@@ -1,2 +1,2 @@
 # japanese-app
-japanese
+korean / 한국인 입니다.
