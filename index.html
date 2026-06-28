@@ -1,322 +1,731 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>일본어 가나 + 기초 단어 암기 앱 v4</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>かな帖 — 가나 & 여행 일본어</title>
 <style>
   :root{
-    --bg:#f6f8fb; --card:#fff; --text:#20242a; --muted:#6b7280; --line:#e5e7eb;
-    --main:#2563eb; --good:#16a34a; --bad:#dc2626; --soft:#eef4ff; --word:#7c3aed;
+    --washi:#FAF6F0;
+    --washi-deep:#F1EADC;
+    --sumi:#1C1C1E;
+    --sumi-soft:#4A4540;
+    --inkan:#B33A3A;
+    --inkan-deep:#8E2C2C;
+    --kin:#C9962F;
+    --kin-bg:#FBF1DD;
+    --ao:#2E6E7E;
+    --ao-bg:#E3EFF1;
+    --ai:#3B5A82;
+    --ai-bg:#E7EDF5;
+    --hai:#8B8378;
+    --line:#DDD3C1;
   }
-  *{box-sizing:border-box}
-  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:var(--bg);color:var(--text);}
-  .wrap{max-width:980px;margin:0 auto;padding:18px}
-  h1{font-size:24px;margin:8px 0 6px}
-  h2{font-size:19px;margin:0 0 12px}
-  .sub{color:var(--muted);font-size:14px;margin-bottom:16px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px;box-shadow:0 4px 14px rgba(0,0,0,.04)}
-  .tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
-  .tab{background:#e5e7eb;color:#111827}
-  .tab.active{background:var(--main);color:#fff}
-  .range-grid,.word-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-  .range-option{display:block;border:1px solid var(--line);border-radius:14px;padding:12px;background:#fff;cursor:pointer;font-weight:800}
-  .range-option input{margin-right:7px}
-  .range-option:has(input:checked){border-color:var(--main);background:var(--soft);color:var(--main)}
-  .btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
-  button{border:0;border-radius:12px;padding:11px 14px;font-weight:900;cursor:pointer;background:var(--main);color:#fff;font-size:14px}
-  button.secondary{background:#374151}
-  button.light{background:#eef2ff;color:#1e40af}
-  button.good{background:var(--good)}
-  button.bad{background:var(--bad)}
-  button.word{background:var(--word)}
-  button:disabled{opacity:.45;cursor:not-allowed}
-  .quiz-box{text-align:center}
-  .kana,.word-main{font-size:78px;line-height:1.1;font-weight:900;margin:18px 0 4px}
-  .word-main{font-size:48px}
-  .hint,.small{color:var(--muted);font-size:14px}
-  input[type=text]{width:100%;max-width:360px;border:1px solid var(--line);border-radius:14px;padding:13px;font-size:18px;text-align:center;outline:none}
-  input[type=text]:focus{border-color:var(--main);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
-  .choice-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
-  .choice{background:#f3f4f6;color:#111827;border:1px solid var(--line);font-size:18px}
-  .result{min-height:28px;font-weight:900;margin-top:12px}
-  .ok{color:var(--good)} .no{color:var(--bad)}
-  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-  .stat{background:#f9fafb;border:1px solid var(--line);border-radius:14px;padding:12px 8px;text-align:center}
-  .stat b{display:block;font-size:20px;margin-bottom:3px}
-  .stat span{color:var(--muted);font-size:12px}
-  .bar{width:100%;height:12px;background:#e5e7eb;border-radius:999px;overflow:hidden;margin-top:12px}
-  .bar-inner{height:100%;width:0%;background:var(--main);transition:.25s}
-  .wrong-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-  .wrong-item{border:1px solid var(--line);border-radius:999px;padding:8px 11px;background:#fff7ed;font-weight:800}
-  .table-wrap{overflow:auto}
-  table{width:100%;border-collapse:collapse;font-size:14px}
-  th,td{border:1px solid var(--line);padding:9px;text-align:center}
-  th{background:#f3f4f6}
-  .hide{display:none}
-  .word-card{border:1px solid var(--line);border-radius:16px;padding:13px;background:#fff}
-  .word-card b{font-size:24px;display:block;margin-bottom:4px}
-  .word-card .meaning{font-weight:900;color:#111827}
-  .word-card .roma{color:var(--muted);font-size:13px;margin-top:4px}
-  .pill{display:inline-block;border-radius:999px;background:#f3f4f6;padding:5px 9px;font-size:12px;color:#374151;margin-bottom:6px;font-weight:800}
-  @media(max-width:640px){
-    .range-grid,.choice-grid,.stats,.word-grid{grid-template-columns:1fr}
-    .kana{font-size:68px}.word-main{font-size:42px}
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--washi);
+    background-image:
+      radial-gradient(circle at 15% 20%, rgba(180,160,130,0.08) 0%, transparent 45%),
+      radial-gradient(circle at 85% 80%, rgba(180,160,130,0.08) 0%, transparent 45%);
+    color:var(--sumi);
+    font-family:"Noto Sans KR","Hiragino Sans","Yu Gothic",sans-serif;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:28px 16px 60px;
+    overflow-x:hidden;
+  }
+
+  header{ width:100%; max-width:560px; text-align:center; margin-bottom:18px; }
+  .title-row{ display:flex; align-items:baseline; justify-content:center; gap:10px; }
+  .title-jp{
+    font-family:"Noto Serif JP","Hiragino Mincho ProN","Yu Mincho",serif;
+    font-size:2.0rem; font-weight:700; letter-spacing:0.04em; color:var(--sumi);
+  }
+  .title-stamp{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:30px; height:30px; border:2px solid var(--inkan); border-radius:4px;
+    color:var(--inkan); font-size:0.72rem; font-weight:700; transform:rotate(-6deg); flex-shrink:0;
+  }
+  .subtitle{ margin-top:6px; font-size:0.82rem; color:var(--hai); letter-spacing:0.03em; }
+
+  .control-bar{ width:100%; max-width:560px; display:flex; flex-direction:column; gap:10px; margin-bottom:18px; }
+  .group-label{ font-size:0.72rem; color:var(--hai); font-weight:700; letter-spacing:0.04em; margin-bottom:2px; }
+  .chip-row{ display:flex; gap:6px; flex-wrap:wrap; justify-content:center; }
+  .chip{
+    border:1px solid var(--line); background:#fff; color:var(--sumi-soft);
+    font-size:0.76rem; padding:6px 12px; border-radius:100px; cursor:pointer;
+    transition:all 0.18s ease; font-weight:500; white-space:nowrap;
+  }
+  .chip:hover{ border-color:var(--ao); }
+  .chip.active{ background:var(--sumi); color:var(--washi); border-color:var(--sumi); }
+  .chip.active.cat-hiragana{ background:var(--kin); border-color:var(--kin); color:#fff; }
+  .chip.active.cat-katakana{ background:var(--ao); border-color:var(--ao); color:#fff; }
+  .chip.active.cat-rule{ background:var(--sumi); border-color:var(--sumi); }
+  .chip.active.cat-vocab{ background:var(--ai); border-color:var(--ai); color:#fff; }
+  .chip.active.cat-phrase{ background:var(--inkan); border-color:var(--inkan); color:#fff; }
+
+  .mode-row{ display:flex; justify-content:center; gap:8px; }
+  .mode-btn{
+    flex:1; max-width:160px; padding:9px 14px; border-radius:8px; border:1px solid var(--line);
+    background:#fff; font-size:0.82rem; font-weight:600; color:var(--sumi-soft); cursor:pointer;
+    text-align:center; transition:all 0.18s ease;
+  }
+  .mode-btn.active{ background:var(--sumi); color:var(--washi); border-color:var(--sumi); }
+
+  .progress-strip{ width:100%; max-width:560px; margin-bottom:14px; }
+  .progress-track{ height:5px; border-radius:100px; background:var(--line); overflow:hidden; }
+  .progress-fill{ height:100%; background:linear-gradient(90deg, var(--ao), var(--kin)); border-radius:100px; transition:width 0.3s ease; }
+  .progress-label{ display:flex; justify-content:space-between; margin-top:6px; font-size:0.74rem; color:var(--hai); font-weight:600; }
+  .progress-label .stats{ display:flex; gap:10px; }
+  .stat-correct{ color:var(--ao); }
+  .stat-wrong{ color:var(--inkan); }
+
+  .stage{ width:100%; max-width:560px; perspective:1600px; margin-bottom:22px; }
+  .card-wrap{ position:relative; height:340px; }
+  .card{
+    position:absolute; inset:0; border-radius:18px; cursor:pointer;
+    transform-style:preserve-3d; transition:transform 0.5s cubic-bezier(0.4,0.0,0.2,1);
+    box-shadow:0 1px 3px rgba(28,28,30,0.06), 0 10px 30px -10px rgba(28,28,30,0.18);
+  }
+  .card.flipped{ transform:rotateY(180deg); }
+  .card-face{
+    position:absolute; inset:0; border-radius:18px; backface-visibility:hidden;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:32px 28px; background:#fff;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 38px, rgba(28,28,30,0.012) 39px),
+      repeating-linear-gradient(90deg, transparent, transparent 38px, rgba(28,28,30,0.012) 39px);
+    border:1px solid var(--line); text-align:center;
+  }
+  .card-face.back{ transform:rotateY(180deg); }
+
+  .card-tag{
+    position:absolute; top:18px; left:20px; font-size:0.68rem; font-weight:700;
+    letter-spacing:0.04em; color:var(--hai); background:var(--washi-deep); padding:4px 10px; border-radius:100px;
+  }
+  .card-tag.hiragana{ color:var(--kin); background:var(--kin-bg); }
+  .card-tag.katakana{ color:var(--ao); background:var(--ao-bg); }
+  .card-tag.rule{ color:var(--washi); background:var(--sumi); }
+  .card-tag.vocab{ color:var(--ai); background:var(--ai-bg); }
+  .card-tag.phrase{ color:var(--inkan-deep); background:#F7E8E5; }
+
+  .card-counter{ position:absolute; top:18px; right:20px; font-size:0.74rem; color:var(--hai); font-weight:600; }
+
+  .card-jp{
+    font-family:"Noto Serif JP","Hiragino Mincho ProN",serif; font-size:3.4rem; font-weight:700;
+    color:var(--sumi); line-height:1.25; word-break:keep-all;
+  }
+  .card-jp.compact{ font-size:1.8rem; }
+  .card-jp.kana-glyph{ font-size:4.6rem; }
+  .card-reading{ margin-top:10px; font-size:1rem; color:var(--hai); letter-spacing:0.03em; }
+  .card-hint{ margin-top:22px; font-size:0.76rem; color:var(--hai); display:flex; align-items:center; gap:6px; }
+  .card-hint svg{ width:13px; height:13px; opacity:0.7; }
+
+  .speak-btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:5px;
+    margin-top:14px; padding:7px 16px; border-radius:100px; border:1px solid var(--line);
+    background:#fff; color:var(--ao); font-size:0.78rem; font-weight:700; cursor:pointer;
+    transition:all 0.15s ease;
+  }
+  .speak-btn:hover{ background:var(--ao-bg); border-color:var(--ao); }
+  .speak-btn:active{ transform:scale(0.96); }
+  .speak-btn svg{ width:14px; height:14px; }
+  .speak-btn.small{ margin-top:8px; padding:5px 12px; font-size:0.72rem; }
+
+  .card-kr{ font-size:1.55rem; font-weight:700; }
+  .card-reading-back{ margin-top:4px; font-size:0.86rem; color:var(--hai); }
+  .card-note{ margin-top:10px; font-size:0.82rem; color:var(--sumi-soft); background:var(--washi-deep); padding:6px 12px; border-radius:8px; }
+  .card-example{ margin-top:18px; padding-top:16px; border-top:1px dashed var(--line); width:100%; }
+  .card-example-jp{ font-family:"Noto Serif JP",serif; font-size:1.05rem; color:var(--sumi); }
+  .card-example-kr{ margin-top:5px; font-size:0.82rem; color:var(--hai); }
+
+  .stamp-mark{
+    position:absolute; top:14px; right:16px; width:54px; height:54px; border:3px solid var(--inkan);
+    border-radius:8px; color:var(--inkan); display:flex; align-items:center; justify-content:center;
+    font-family:"Noto Serif JP",serif; font-size:0.95rem; font-weight:900; transform:rotate(-12deg) scale(0);
+    opacity:0; pointer-events:none; z-index:5;
+  }
+  .stamp-mark.correct{ animation:stampIn 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+  .stamp-mark.wrong{ border-color:var(--hai); color:var(--hai); animation:stampIn 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+  @keyframes stampIn{
+    0%{ transform:rotate(-12deg) scale(2); opacity:0; }
+    60%{ transform:rotate(-12deg) scale(0.92); opacity:1; }
+    100%{ transform:rotate(-12deg) scale(1); opacity:1; }
+  }
+
+  .nav-row{ display:flex; gap:10px; margin-top:16px; }
+  .nav-btn{
+    flex:1; padding:13px; border-radius:10px; border:none; font-size:0.92rem; font-weight:700;
+    cursor:pointer; transition:all 0.15s ease; display:flex; align-items:center; justify-content:center; gap:6px;
+  }
+  .nav-btn:active{ transform:scale(0.97); }
+  .nav-btn.know{ background:var(--ao); color:#fff; }
+  .nav-btn.know:hover{ background:#255a67; }
+  .nav-btn.dontknow{ background:#fff; color:var(--inkan-deep); border:1.5px solid var(--inkan); }
+  .nav-btn.dontknow:hover{ background:#FDF3F2; }
+  .nav-btn:disabled{ opacity:0.4; cursor:not-allowed; }
+
+  .seek-row{ display:flex; justify-content:space-between; align-items:center; margin-top:12px; }
+  .seek-btn{ background:none; border:none; color:var(--hai); font-size:0.85rem; cursor:pointer; padding:6px 10px; display:flex; align-items:center; gap:4px; }
+  .seek-btn:hover{ color:var(--sumi); }
+  .seek-btn:disabled{ opacity:0.3; cursor:not-allowed; }
+  .shuffle-btn{
+    background:none; border:1px solid var(--line); border-radius:100px; padding:6px 14px;
+    font-size:0.78rem; color:var(--sumi-soft); cursor:pointer; display:flex; align-items:center; gap:5px;
+  }
+  .shuffle-btn:hover{ border-color:var(--ao); color:var(--ao); }
+
+  .quiz-panel{ width:100%; max-width:560px; }
+  .quiz-question{
+    background:#fff; border:1px solid var(--line); border-radius:18px; padding:36px 28px; text-align:center;
+    margin-bottom:18px; box-shadow:0 1px 3px rgba(28,28,30,0.06), 0 10px 30px -10px rgba(28,28,30,0.18);
+  }
+  .quiz-options{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .quiz-opt{
+    background:#fff; border:1.5px solid var(--line); border-radius:12px; padding:16px 14px;
+    font-size:0.92rem; font-weight:600; color:var(--sumi); cursor:pointer; transition:all 0.15s ease; text-align:center;
+  }
+  .quiz-opt:hover{ border-color:var(--ao); }
+  .quiz-opt.correct{ background:var(--ao-bg); border-color:var(--ao); color:var(--ao); }
+  .quiz-opt.wrong{ background:#FDF1F0; border-color:var(--inkan); color:var(--inkan-deep); }
+  .quiz-opt.disabled{ pointer-events:none; }
+  .quiz-opt.faded{ opacity:0.45; }
+
+  .quiz-next{
+    margin-top:16px; width:100%; padding:14px; border-radius:10px; border:none; background:var(--sumi);
+    color:var(--washi); font-size:0.92rem; font-weight:700; cursor:pointer; opacity:0; pointer-events:none;
+    transition:opacity 0.2s ease;
+  }
+  .quiz-next.show{ opacity:1; pointer-events:auto; }
+
+  .complete-screen{
+    width:100%; max-width:560px; background:#fff; border:1px solid var(--line); border-radius:18px;
+    padding:48px 32px; text-align:center; box-shadow:0 1px 3px rgba(28,28,30,0.06), 0 10px 30px -10px rgba(28,28,30,0.18);
+  }
+  .complete-stamp{
+    font-family:"Noto Serif JP",serif; font-size:1.4rem; font-weight:900; color:var(--inkan);
+    border:3px solid var(--inkan); border-radius:8px; display:inline-block; padding:10px 22px;
+    transform:rotate(-4deg); margin-bottom:18px;
+  }
+  .complete-score{ font-size:2.2rem; font-weight:800; color:var(--sumi); margin-bottom:6px; }
+  .complete-desc{ font-size:0.88rem; color:var(--hai); margin-bottom:24px; }
+  .complete-actions{ display:flex; gap:10px; justify-content:center; }
+  .complete-btn{ padding:12px 22px; border-radius:10px; font-size:0.88rem; font-weight:700; cursor:pointer; border:none; }
+  .complete-btn.primary{ background:var(--ao); color:#fff; }
+  .complete-btn.secondary{ background:#fff; border:1px solid var(--line); color:var(--sumi-soft); }
+
+  .wrong-list{ margin-top:22px; text-align:left; border-top:1px dashed var(--line); padding-top:18px; }
+  .wrong-list-title{ font-size:0.78rem; font-weight:700; color:var(--hai); margin-bottom:10px; letter-spacing:0.03em; }
+  .wrong-item{ display:flex; justify-content:space-between; align-items:baseline; padding:8px 0; border-bottom:1px solid var(--washi-deep); font-size:0.88rem; }
+  .wrong-item .jp{ font-family:"Noto Serif JP",serif; font-weight:700; color:var(--sumi); }
+  .wrong-item .kr{ color:var(--hai); }
+
+  footer{ margin-top:26px; font-size:0.72rem; color:var(--hai); text-align:center; }
+
+  @media (max-width:420px){
+    .title-jp{ font-size:1.6rem; }
+    .card-wrap{ height:320px; }
+    .card-jp{ font-size:2.6rem; }
+    .card-jp.compact{ font-size:1.5rem; }
+    .card-jp.kana-glyph{ font-size:3.8rem; }
+    .quiz-options{ grid-template-columns:1fr; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .card, .stamp-mark{ animation:none !important; transition:none !important; }
   }
 </style>
-
-<link rel="manifest" href="./manifest.json">
-<meta name="theme-color" content="#2563eb">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="일본어 암기">
-<link rel="apple-touch-icon" href="./icon-192.png">
-<script>
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", function() {
-    navigator.serviceWorker.register("./service-worker.js").catch(function(err) {
-      console.log("Service worker registration failed:", err);
-    });
-  });
-}
-</script>
-
 </head>
 <body>
-<div class="wrap">
-  <h1>🇯🇵 일본어 가나 + 기초 단어 암기 앱 v4</h1>
-  <div class="sub">가나 읽기 → 단어 암기 → 퀴즈까지 한 번에 연습하는 초보용 앱 😊</div>
 
-  <div class="tabs">
-    <button class="tab active" id="kanaTab" onclick="switchTab('kana')">가나 학습</button>
-    <button class="tab" id="wordTab" onclick="switchTab('word')">기초 단어</button>
+<header>
+  <div class="title-row">
+    <span class="title-jp">かな帖</span>
+    <span class="title-stamp">旅</span>
   </div>
+  <div class="subtitle">히라가나 · 카타카나 · 기초 단어 · 여행 회화 (한자 없음)</div>
+</header>
 
-  <section id="kanaSection">
-    <div class="card">
-      <h2>📌 학습 범위 선택 <span class="small">하나만 선택 가능</span></h2>
-      <div class="range-grid">
-        <label class="range-option"><input type="radio" name="range" value="hiragana" checked> 히라가나</label>
-        <label class="range-option"><input type="radio" name="range" value="katakana"> 카타카나</label>
-        <label class="range-option"><input type="radio" name="range" value="yoon"> 요음</label>
-        <label class="range-option"><input type="radio" name="range" value="dakuon"> 탁음</label>
-        <label class="range-option"><input type="radio" name="range" value="handakuon"> 반탁음</label>
-      </div>
-      <div class="btns">
-        <button onclick="startKanaQuiz('choice')">4지선다 시작</button>
-        <button class="secondary" onclick="startKanaQuiz('typing')">직접입력 시작</button>
-        <button class="light" onclick="showKanaTable()">표 보기</button>
-        <button class="bad" onclick="startKanaWrongQuiz()" id="wrongQuizBtn" disabled>오답만 다시 풀기</button>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>📊 가나 학습 진도</h2>
-      <div class="stats">
-        <div class="stat"><b id="totalCount">0</b><span>전체 문제</span></div>
-        <div class="stat"><b id="solvedCount">0</b><span>푼 문제</span></div>
-        <div class="stat"><b id="correctCount">0</b><span>정답</span></div>
-        <div class="stat"><b id="rateCount">0%</b><span>정답률</span></div>
-      </div>
-      <div class="bar"><div class="bar-inner" id="progressBar"></div></div>
-      <div class="btns"><button class="light" onclick="resetKanaStats()">가나 진도 초기화</button></div>
-    </div>
-
-    <div class="card quiz-box">
-      <h2>🎯 가나 퀴즈</h2>
-      <div id="quizArea"><div class="hint">학습 범위를 선택하고 시작 버튼을 눌러주세요 😊</div></div>
-    </div>
-
-    <div class="card">
-      <h2>📝 가나 오답노트</h2>
-      <div class="small">틀린 글자는 자동 저장돼요. 다시 맞히면 오답노트에서 제거됩니다.</div>
-      <div id="wrongList" class="wrong-list"></div>
-    </div>
-
-    <div class="card" id="tableCard" style="display:none;">
-      <h2>📖 가나 학습표</h2>
-      <div class="table-wrap" id="tableArea"></div>
-    </div>
-  </section>
-
-  <section id="wordSection" class="hide">
-    <div class="card">
-      <h2>📘 미리네 추천 기초 필수 단어집</h2>
-      <div class="small">처음에는 하루 5개만 반복 추천! “단어 보기 → 발음 듣기 → 뜻 맞추기” 순서가 좋아요 😄</div>
-      <div class="btns">
-        <button class="word" onclick="startWordQuiz('meaning')">뜻 맞추기 퀴즈</button>
-        <button class="secondary" onclick="startWordQuiz('jp')">일본어 맞추기</button>
-        <button class="light" onclick="showWordList()">단어집 보기</button>
-        <button class="bad" onclick="startWordWrongQuiz()" id="wordWrongBtn" disabled>단어 오답만 풀기</button>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>📊 단어 학습 진도</h2>
-      <div class="stats">
-        <div class="stat"><b id="wordTotal">0</b><span>전체 단어</span></div>
-        <div class="stat"><b id="wordSolved">0</b><span>푼 문제</span></div>
-        <div class="stat"><b id="wordCorrect">0</b><span>정답</span></div>
-        <div class="stat"><b id="wordRate">0%</b><span>정답률</span></div>
-      </div>
-      <div class="bar"><div class="bar-inner" id="wordProgressBar" style="background:var(--word)"></div></div>
-      <div class="btns"><button class="light" onclick="resetWordStats()">단어 진도 초기화</button></div>
-    </div>
-
-    <div class="card quiz-box">
-      <h2>🎯 단어 퀴즈</h2>
-      <div id="wordQuizArea"><div class="hint">단어 퀴즈 버튼을 눌러주세요 😊</div></div>
-    </div>
-
-    <div class="card">
-      <h2>📝 단어 오답노트</h2>
-      <div class="small">틀린 단어가 자동 저장돼요. 다시 맞히면 오답노트에서 제거됩니다.</div>
-      <div id="wordWrongList" class="wrong-list"></div>
-    </div>
-
-    <div class="card" id="wordListCard" style="display:none;">
-      <h2>📚 단어집</h2>
-      <div class="word-grid" id="wordListArea"></div>
-    </div>
-  </section>
+<div class="control-bar">
+  <div class="chip-row" id="categoryChips"></div>
+  <div class="mode-row">
+    <button class="mode-btn active" data-mode="flip" id="modeFlip">카드 뒤집기</button>
+    <button class="mode-btn" data-mode="quiz" id="modeQuiz">자가 테스트</button>
+  </div>
 </div>
 
+<div class="progress-strip">
+  <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  <div class="progress-label">
+    <span id="progressCount">0 / 0</span>
+    <span class="stats">
+      <span class="stat-correct" id="statCorrect">✓ 0</span>
+      <span class="stat-wrong" id="statWrong">✗ 0</span>
+    </span>
+  </div>
+</div>
+
+<div class="stage" id="flipStage">
+  <div class="card-wrap" id="cardWrap">
+    <div class="card" id="card">
+      <div class="card-face front" id="cardFront">
+        <span class="card-tag" id="tagFront">히라가나</span>
+        <span class="card-counter" id="counterFront">1 / 312</span>
+        <div class="card-jp" id="jpFront">あ</div>
+        <div class="card-reading" id="readingFront"></div>
+        <button class="speak-btn" id="speakFrontBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/></svg>
+          발음 듣기
+        </button>
+        <div class="card-hint">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 11-9-9c2.5 0 4.7 1 6.3 2.7"/><path d="M21 3v6h-6"/></svg>
+          탭하여 발음·뜻 보기
+        </div>
+      </div>
+      <div class="card-face back" id="cardBack">
+        <div class="stamp-mark" id="stampMark">合</div>
+        <span class="card-tag" id="tagBack">히라가나</span>
+        <span class="card-counter" id="counterBack">1 / 312</span>
+        <div class="card-kr" id="krBack">아 (a)</div>
+        <div class="card-reading-back" id="readingBack" style="display:none;"></div>
+        <button class="speak-btn small" id="speakBackBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/></svg>
+          발음 듣기
+        </button>
+        <div class="card-note" id="noteBack" style="display:none;"></div>
+        <div class="card-example" id="exampleBlock" style="display:none;">
+          <div class="card-example-jp" id="exampleJp"></div>
+          <div class="card-example-kr" id="exampleKr"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-row">
+    <button class="nav-btn dontknow" id="btnDontKnow">✗ 아직 모름</button>
+    <button class="nav-btn know" id="btnKnow">✓ 외웠음</button>
+  </div>
+  <div class="seek-row">
+    <button class="seek-btn" id="btnPrev">← 이전</button>
+    <button class="shuffle-btn" id="btnShuffle">⤨ 섞기</button>
+    <button class="seek-btn" id="btnNext">다음 →</button>
+  </div>
+</div>
+
+<div class="quiz-panel" id="quizStage" style="display:none;">
+  <div class="quiz-question">
+    <span class="card-tag" id="quizTag" style="position:static; display:inline-block; margin-bottom:14px;">히라가나</span>
+    <div class="card-jp" id="quizJp" style="font-size:2.8rem;">あ</div>
+    <div class="card-reading" id="quizReading"></div>
+    <button class="speak-btn small" id="speakQuizBtn" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/></svg>
+      발음 듣기
+    </button>
+  </div>
+  <div class="quiz-options" id="quizOptions"></div>
+  <button class="quiz-next" id="quizNextBtn">다음 문제 →</button>
+</div>
+
+<div class="complete-screen" id="completeScreen" style="display:none;">
+  <div class="complete-stamp">修了</div>
+  <div class="complete-score" id="completeScore">0 / 0</div>
+  <div class="complete-desc">이번 세트를 모두 확인했어요</div>
+  <div class="complete-actions">
+    <button class="complete-btn secondary" id="btnRestartAll">처음부터</button>
+    <button class="complete-btn primary" id="btnRetryWrong">틀린 것만 다시</button>
+  </div>
+  <div class="wrong-list" id="wrongListWrap" style="display:none;">
+    <div class="wrong-list-title">다시 볼 카드</div>
+    <div id="wrongListItems"></div>
+  </div>
+</div>
+
+<footer>
+  탭 또는 클릭으로 카드를 넘겨보세요 · 진도는 이 브라우저에 자동 저장됩니다
+  <br>
+  <button id="btnResetProgress" style="margin-top:8px; background:none; border:none; color:var(--hai); font-size:0.72rem; text-decoration:underline; cursor:pointer;">전체 학습 진도 초기화</button>
+</footer>
+
 <script>
-const kanaData = {
-  hiragana:[["あ","a","아"],["い","i","이"],["う","u","우"],["え","e","에"],["お","o","오"],["か","ka","카"],["き","ki","키"],["く","ku","쿠"],["け","ke","케"],["こ","ko","코"],["さ","sa","사"],["し","shi","시"],["す","su","스"],["せ","se","세"],["そ","so","소"],["た","ta","타"],["ち","chi","치"],["つ","tsu","츠"],["て","te","테"],["と","to","토"],["な","na","나"],["に","ni","니"],["ぬ","nu","누"],["ね","ne","네"],["の","no","노"],["は","ha","하"],["ひ","hi","히"],["ふ","fu","후"],["へ","he","헤"],["ほ","ho","호"],["ま","ma","마"],["み","mi","미"],["む","mu","무"],["め","me","메"],["も","mo","모"],["や","ya","야"],["ゆ","yu","유"],["よ","yo","요"],["ら","ra","라"],["り","ri","리"],["る","ru","루"],["れ","re","레"],["ろ","ro","로"],["わ","wa","와"],["を","wo","오"],["ん","n","응"]],
-  katakana:[["ア","a","아"],["イ","i","이"],["ウ","u","우"],["エ","e","에"],["オ","o","오"],["カ","ka","카"],["キ","ki","키"],["ク","ku","쿠"],["ケ","ke","케"],["コ","ko","코"],["サ","sa","사"],["シ","shi","시"],["ス","su","스"],["セ","se","세"],["ソ","so","소"],["タ","ta","타"],["チ","chi","치"],["ツ","tsu","츠"],["テ","te","테"],["ト","to","토"],["ナ","na","나"],["ニ","ni","니"],["ヌ","nu","누"],["ネ","ne","네"],["ノ","no","노"],["ハ","ha","하"],["ヒ","hi","히"],["フ","fu","후"],["ヘ","he","헤"],["ホ","ho","호"],["マ","ma","마"],["ミ","mi","미"],["ム","mu","무"],["メ","me","메"],["モ","mo","모"],["ヤ","ya","야"],["ユ","yu","유"],["ヨ","yo","요"],["ラ","ra","라"],["リ","ri","리"],["ル","ru","루"],["レ","re","레"],["ロ","ro","로"],["ワ","wa","와"],["ヲ","wo","오"],["ン","n","응"]],
-  yoon:[["きゃ","kya","캬"],["きゅ","kyu","큐"],["きょ","kyo","쿄"],["しゃ","sha","샤"],["しゅ","shu","슈"],["しょ","sho","쇼"],["ちゃ","cha","챠"],["ちゅ","chu","츄"],["ちょ","cho","쵸"],["にゃ","nya","냐"],["にゅ","nyu","뉴"],["にょ","nyo","뇨"],["ひゃ","hya","햐"],["ひゅ","hyu","휴"],["ひょ","hyo","효"],["みゃ","mya","먀"],["みゅ","myu","뮤"],["みょ","myo","묘"],["りゃ","rya","랴"],["りゅ","ryu","류"],["りょ","ryo","료"]],
-  dakuon:[["が","ga","가"],["ぎ","gi","기"],["ぐ","gu","구"],["げ","ge","게"],["ご","go","고"],["ざ","za","자"],["じ","ji","지"],["ず","zu","즈"],["ぜ","ze","제"],["ぞ","zo","조"],["だ","da","다"],["ぢ","ji","지"],["づ","zu","즈"],["で","de","데"],["ど","do","도"],["ば","ba","바"],["び","bi","비"],["ぶ","bu","부"],["べ","be","베"],["ぼ","bo","보"]],
-  handakuon:[["ぱ","pa","파"],["ぴ","pi","피"],["ぷ","pu","푸"],["ぺ","pe","페"],["ぽ","po","포"]]
-};
+const DECK = [{"id": 1, "category": "hiragana", "sub": "히라가나 청음", "jp": "あ", "reading": "a", "kr": "아 (a)"}, {"id": 2, "category": "hiragana", "sub": "히라가나 청음", "jp": "い", "reading": "i", "kr": "이 (i)"}, {"id": 3, "category": "hiragana", "sub": "히라가나 청음", "jp": "う", "reading": "u", "kr": "우 (u)"}, {"id": 4, "category": "hiragana", "sub": "히라가나 청음", "jp": "え", "reading": "e", "kr": "에 (e)"}, {"id": 5, "category": "hiragana", "sub": "히라가나 청음", "jp": "お", "reading": "o", "kr": "오 (o)"}, {"id": 6, "category": "hiragana", "sub": "히라가나 청음", "jp": "か", "reading": "ka", "kr": "카 (ka)"}, {"id": 7, "category": "hiragana", "sub": "히라가나 청음", "jp": "き", "reading": "ki", "kr": "키 (ki)"}, {"id": 8, "category": "hiragana", "sub": "히라가나 청음", "jp": "く", "reading": "ku", "kr": "쿠 (ku)"}, {"id": 9, "category": "hiragana", "sub": "히라가나 청음", "jp": "け", "reading": "ke", "kr": "케 (ke)"}, {"id": 10, "category": "hiragana", "sub": "히라가나 청음", "jp": "こ", "reading": "ko", "kr": "코 (ko)"}, {"id": 11, "category": "hiragana", "sub": "히라가나 청음", "jp": "さ", "reading": "sa", "kr": "사 (sa)"}, {"id": 12, "category": "hiragana", "sub": "히라가나 청음", "jp": "し", "reading": "shi", "kr": "시 (shi)"}, {"id": 13, "category": "hiragana", "sub": "히라가나 청음", "jp": "す", "reading": "su", "kr": "스 (su)"}, {"id": 14, "category": "hiragana", "sub": "히라가나 청음", "jp": "せ", "reading": "se", "kr": "세 (se)"}, {"id": 15, "category": "hiragana", "sub": "히라가나 청음", "jp": "そ", "reading": "so", "kr": "소 (so)"}, {"id": 16, "category": "hiragana", "sub": "히라가나 청음", "jp": "た", "reading": "ta", "kr": "타 (ta)"}, {"id": 17, "category": "hiragana", "sub": "히라가나 청음", "jp": "ち", "reading": "chi", "kr": "치 (chi)"}, {"id": 18, "category": "hiragana", "sub": "히라가나 청음", "jp": "つ", "reading": "tsu", "kr": "츠 (tsu)"}, {"id": 19, "category": "hiragana", "sub": "히라가나 청음", "jp": "て", "reading": "te", "kr": "테 (te)"}, {"id": 20, "category": "hiragana", "sub": "히라가나 청음", "jp": "と", "reading": "to", "kr": "토 (to)"}, {"id": 21, "category": "hiragana", "sub": "히라가나 청음", "jp": "な", "reading": "na", "kr": "나 (na)"}, {"id": 22, "category": "hiragana", "sub": "히라가나 청음", "jp": "に", "reading": "ni", "kr": "니 (ni)"}, {"id": 23, "category": "hiragana", "sub": "히라가나 청음", "jp": "ぬ", "reading": "nu", "kr": "누 (nu)"}, {"id": 24, "category": "hiragana", "sub": "히라가나 청음", "jp": "ね", "reading": "ne", "kr": "네 (ne)"}, {"id": 25, "category": "hiragana", "sub": "히라가나 청음", "jp": "の", "reading": "no", "kr": "노 (no)"}, {"id": 26, "category": "hiragana", "sub": "히라가나 청음", "jp": "は", "reading": "ha", "kr": "하 (ha)"}, {"id": 27, "category": "hiragana", "sub": "히라가나 청음", "jp": "ひ", "reading": "hi", "kr": "히 (hi)"}, {"id": 28, "category": "hiragana", "sub": "히라가나 청음", "jp": "ふ", "reading": "fu", "kr": "후 (fu)"}, {"id": 29, "category": "hiragana", "sub": "히라가나 청음", "jp": "へ", "reading": "he", "kr": "헤 (he)"}, {"id": 30, "category": "hiragana", "sub": "히라가나 청음", "jp": "ほ", "reading": "ho", "kr": "호 (ho)"}, {"id": 31, "category": "hiragana", "sub": "히라가나 청음", "jp": "ま", "reading": "ma", "kr": "마 (ma)"}, {"id": 32, "category": "hiragana", "sub": "히라가나 청음", "jp": "み", "reading": "mi", "kr": "미 (mi)"}, {"id": 33, "category": "hiragana", "sub": "히라가나 청음", "jp": "む", "reading": "mu", "kr": "무 (mu)"}, {"id": 34, "category": "hiragana", "sub": "히라가나 청음", "jp": "め", "reading": "me", "kr": "메 (me)"}, {"id": 35, "category": "hiragana", "sub": "히라가나 청음", "jp": "も", "reading": "mo", "kr": "모 (mo)"}, {"id": 36, "category": "hiragana", "sub": "히라가나 청음", "jp": "や", "reading": "ya", "kr": "야 (ya)"}, {"id": 37, "category": "hiragana", "sub": "히라가나 청음", "jp": "ゆ", "reading": "yu", "kr": "유 (yu)"}, {"id": 38, "category": "hiragana", "sub": "히라가나 청음", "jp": "よ", "reading": "yo", "kr": "요 (yo)"}, {"id": 39, "category": "hiragana", "sub": "히라가나 청음", "jp": "ら", "reading": "ra", "kr": "라 (ra)"}, {"id": 40, "category": "hiragana", "sub": "히라가나 청음", "jp": "り", "reading": "ri", "kr": "리 (ri)"}, {"id": 41, "category": "hiragana", "sub": "히라가나 청음", "jp": "る", "reading": "ru", "kr": "루 (ru)"}, {"id": 42, "category": "hiragana", "sub": "히라가나 청음", "jp": "れ", "reading": "re", "kr": "레 (re)"}, {"id": 43, "category": "hiragana", "sub": "히라가나 청음", "jp": "ろ", "reading": "ro", "kr": "로 (ro)"}, {"id": 44, "category": "hiragana", "sub": "히라가나 청음", "jp": "わ", "reading": "wa", "kr": "와 (wa)"}, {"id": 45, "category": "hiragana", "sub": "히라가나 청음", "jp": "を", "reading": "wo", "kr": "오 (wo)"}, {"id": 46, "category": "hiragana", "sub": "히라가나 청음", "jp": "ん", "reading": "n", "kr": "응 (n)"}, {"id": 47, "category": "hiragana", "sub": "히라가나 탁음·반탁음", "jp": "が", "reading": "ga", "kr": "가 (ga)"}, {"id": 48, "category": "hiragana", "sub": "히라가나 탁음·반탁음", "jp": "ぎ", "reading": "gi", "kr": "기 (gi)"}, {"id": 49, "category": "hiragana", "sub": "히라가나 탁음·반탁음", "jp": "ぐ", "reading": "gu", "kr": "구 (gu)"}, {"id": 50, "category": "hiragana", "sub": "히라가나 탁음·반탁음", "jp": "げ", "reading": "ge", "kr": "게 (ge)"}, {"id": 51, "category": "hiragana", "sub": "히라가나 탁음·반탁음", "jp": "ご", "reading": "go", "kr": "고 (go)"}, {"id": 52, "category": "hiragana", "sub": "히라가나 탁음·반탁음", "jp": "ざ", "reading": "za", "kr": "자 (za)"}, {"id": 53, "category": "hiragana", "sub": "히라가나 탁음·반탁음", "jp": "じ", "reading": "ji", "kr": "지 (ji)"}, {"id": 54, "category": "hiragana", "sub": "히라가나 탁음·반탁음", "jp": "ず", "reading": "zu", "kr": "즈 (zu)"}, {"id": 55, "category": "hiragana", "sub": "히라가나 탁음·반탁음", "jp": "ぜ", "reading": "ze", "kr": "제 (ze)"}, {"id": 56, "category": "hiragana", "sub": "히라가나 탁음·반탁음", "jp": "ぞ", "reading": "zo", "kr": "조 (zo)"}, {"id": 57, "category": "hiragana", "sub": "히라가나 탁음·반탁음", "jp": "だ", "reading": "da", "kr": "다 (da)"}, {"id": 58, "category": "hiragana", "sub": "히라가나 탁음·반탁음", "jp": "ぢ", "reading": "ji", "kr": "지 (ji)"}, {"id": 59, "category": "hiragana", "sub": "히라가나 탁음·반탁음", "jp": "づ", "reading": "zu", "kr": "즈 (zu)"}, {"id": 60, "category": "hiragana", "sub": "히라가나 탁음·반탁음", "jp": "で", "reading": "de", "kr": "데 (de)"}, {"id": 61, "category": "hiragana", "sub": "히라가나 탁음·반탁음", "jp": "ど", "reading": "do", "kr": "도 (do)"}, {"id": 62, "category": "hiragana", "sub": "히라가나 탁음·반탁음", "jp": "ば", "reading": "ba", "kr": "바 (ba)"}, {"id": 63, "category": "hiragana", "sub": "히라가나 탁음·반탁음", "jp": "び", "reading": "bi", "kr": "비 (bi)"}, {"id": 64, "category": "hiragana", "sub": "히라가나 탁음·반탁음", "jp": "ぶ", "reading": "bu", "kr": "부 (bu)"}, {"id": 65, "category": "hiragana", "sub": "히라가나 탁음·반탁음", "jp": "べ", "reading": "be", "kr": "베 (be)"}, {"id": 66, "category": "hiragana", "sub": "히라가나 탁음·반탁음", "jp": "ぼ", "reading": "bo", "kr": "보 (bo)"}, {"id": 67, "category": "hiragana", "sub": "히라가나 탁음·반탁음", "jp": "ぱ", "reading": "pa", "kr": "파 (pa)"}, {"id": 68, "category": "hiragana", "sub": "히라가나 탁음·반탁음", "jp": "ぴ", "reading": "pi", "kr": "피 (pi)"}, {"id": 69, "category": "hiragana", "sub": "히라가나 탁음·반탁음", "jp": "ぷ", "reading": "pu", "kr": "푸 (pu)"}, {"id": 70, "category": "hiragana", "sub": "히라가나 탁음·반탁음", "jp": "ぺ", "reading": "pe", "kr": "페 (pe)"}, {"id": 71, "category": "hiragana", "sub": "히라가나 탁음·반탁음", "jp": "ぽ", "reading": "po", "kr": "포 (po)"}, {"id": 72, "category": "hiragana", "sub": "히라가나 요음", "jp": "きゃ", "reading": "kya", "kr": "캬 (kya)"}, {"id": 73, "category": "hiragana", "sub": "히라가나 요음", "jp": "きゅ", "reading": "kyu", "kr": "큐 (kyu)"}, {"id": 74, "category": "hiragana", "sub": "히라가나 요음", "jp": "きょ", "reading": "kyo", "kr": "쿄 (kyo)"}, {"id": 75, "category": "hiragana", "sub": "히라가나 요음", "jp": "しゃ", "reading": "sha", "kr": "샤 (sha)"}, {"id": 76, "category": "hiragana", "sub": "히라가나 요음", "jp": "しゅ", "reading": "shu", "kr": "슈 (shu)"}, {"id": 77, "category": "hiragana", "sub": "히라가나 요음", "jp": "しょ", "reading": "sho", "kr": "쇼 (sho)"}, {"id": 78, "category": "hiragana", "sub": "히라가나 요음", "jp": "ちゃ", "reading": "cha", "kr": "차 (cha)"}, {"id": 79, "category": "hiragana", "sub": "히라가나 요음", "jp": "ちゅ", "reading": "chu", "kr": "추 (chu)"}, {"id": 80, "category": "hiragana", "sub": "히라가나 요음", "jp": "ちょ", "reading": "cho", "kr": "초 (cho)"}, {"id": 81, "category": "hiragana", "sub": "히라가나 요음", "jp": "にゃ", "reading": "nya", "kr": "냐 (nya)"}, {"id": 82, "category": "hiragana", "sub": "히라가나 요음", "jp": "にゅ", "reading": "nyu", "kr": "뉴 (nyu)"}, {"id": 83, "category": "hiragana", "sub": "히라가나 요음", "jp": "にょ", "reading": "nyo", "kr": "뇨 (nyo)"}, {"id": 84, "category": "hiragana", "sub": "히라가나 요음", "jp": "ひゃ", "reading": "hya", "kr": "햐 (hya)"}, {"id": 85, "category": "hiragana", "sub": "히라가나 요음", "jp": "ひゅ", "reading": "hyu", "kr": "휴 (hyu)"}, {"id": 86, "category": "hiragana", "sub": "히라가나 요음", "jp": "ひょ", "reading": "hyo", "kr": "효 (hyo)"}, {"id": 87, "category": "hiragana", "sub": "히라가나 요음", "jp": "みゃ", "reading": "mya", "kr": "먀 (mya)"}, {"id": 88, "category": "hiragana", "sub": "히라가나 요음", "jp": "みゅ", "reading": "myu", "kr": "뮤 (myu)"}, {"id": 89, "category": "hiragana", "sub": "히라가나 요음", "jp": "みょ", "reading": "myo", "kr": "묘 (myo)"}, {"id": 90, "category": "hiragana", "sub": "히라가나 요음", "jp": "りゃ", "reading": "rya", "kr": "랴 (rya)"}, {"id": 91, "category": "hiragana", "sub": "히라가나 요음", "jp": "りゅ", "reading": "ryu", "kr": "류 (ryu)"}, {"id": 92, "category": "hiragana", "sub": "히라가나 요음", "jp": "りょ", "reading": "ryo", "kr": "료 (ryo)"}, {"id": 93, "category": "hiragana", "sub": "히라가나 요음", "jp": "ぎゃ", "reading": "gya", "kr": "갸 (gya)"}, {"id": 94, "category": "hiragana", "sub": "히라가나 요음", "jp": "ぎゅ", "reading": "gyu", "kr": "규 (gyu)"}, {"id": 95, "category": "hiragana", "sub": "히라가나 요음", "jp": "ぎょ", "reading": "gyo", "kr": "교 (gyo)"}, {"id": 96, "category": "hiragana", "sub": "히라가나 요음", "jp": "じゃ", "reading": "ja", "kr": "자 (ja)"}, {"id": 97, "category": "hiragana", "sub": "히라가나 요음", "jp": "じゅ", "reading": "ju", "kr": "주 (ju)"}, {"id": 98, "category": "hiragana", "sub": "히라가나 요음", "jp": "じょ", "reading": "jo", "kr": "조 (jo)"}, {"id": 99, "category": "hiragana", "sub": "히라가나 요음", "jp": "びゃ", "reading": "bya", "kr": "뱌 (bya)"}, {"id": 100, "category": "hiragana", "sub": "히라가나 요음", "jp": "びゅ", "reading": "byu", "kr": "뷰 (byu)"}, {"id": 101, "category": "hiragana", "sub": "히라가나 요음", "jp": "びょ", "reading": "byo", "kr": "뵤 (byo)"}, {"id": 102, "category": "hiragana", "sub": "히라가나 요음", "jp": "ぴゃ", "reading": "pya", "kr": "퍄 (pya)"}, {"id": 103, "category": "hiragana", "sub": "히라가나 요음", "jp": "ぴゅ", "reading": "pyu", "kr": "퓨 (pyu)"}, {"id": 104, "category": "hiragana", "sub": "히라가나 요음", "jp": "ぴょ", "reading": "pyo", "kr": "표 (pyo)"}, {"id": 105, "category": "katakana", "sub": "가타카나 청음", "jp": "ア", "reading": "a", "kr": "아 (a)"}, {"id": 106, "category": "katakana", "sub": "가타카나 청음", "jp": "イ", "reading": "i", "kr": "이 (i)"}, {"id": 107, "category": "katakana", "sub": "가타카나 청음", "jp": "ウ", "reading": "u", "kr": "우 (u)"}, {"id": 108, "category": "katakana", "sub": "가타카나 청음", "jp": "エ", "reading": "e", "kr": "에 (e)"}, {"id": 109, "category": "katakana", "sub": "가타카나 청음", "jp": "オ", "reading": "o", "kr": "오 (o)"}, {"id": 110, "category": "katakana", "sub": "가타카나 청음", "jp": "カ", "reading": "ka", "kr": "카 (ka)"}, {"id": 111, "category": "katakana", "sub": "가타카나 청음", "jp": "キ", "reading": "ki", "kr": "키 (ki)"}, {"id": 112, "category": "katakana", "sub": "가타카나 청음", "jp": "ク", "reading": "ku", "kr": "쿠 (ku)"}, {"id": 113, "category": "katakana", "sub": "가타카나 청음", "jp": "ケ", "reading": "ke", "kr": "케 (ke)"}, {"id": 114, "category": "katakana", "sub": "가타카나 청음", "jp": "コ", "reading": "ko", "kr": "코 (ko)"}, {"id": 115, "category": "katakana", "sub": "가타카나 청음", "jp": "サ", "reading": "sa", "kr": "사 (sa)"}, {"id": 116, "category": "katakana", "sub": "가타카나 청음", "jp": "シ", "reading": "shi", "kr": "시 (shi)"}, {"id": 117, "category": "katakana", "sub": "가타카나 청음", "jp": "ス", "reading": "su", "kr": "스 (su)"}, {"id": 118, "category": "katakana", "sub": "가타카나 청음", "jp": "セ", "reading": "se", "kr": "세 (se)"}, {"id": 119, "category": "katakana", "sub": "가타카나 청음", "jp": "ソ", "reading": "so", "kr": "소 (so)"}, {"id": 120, "category": "katakana", "sub": "가타카나 청음", "jp": "タ", "reading": "ta", "kr": "타 (ta)"}, {"id": 121, "category": "katakana", "sub": "가타카나 청음", "jp": "チ", "reading": "chi", "kr": "치 (chi)"}, {"id": 122, "category": "katakana", "sub": "가타카나 청음", "jp": "ツ", "reading": "tsu", "kr": "츠 (tsu)"}, {"id": 123, "category": "katakana", "sub": "가타카나 청음", "jp": "テ", "reading": "te", "kr": "테 (te)"}, {"id": 124, "category": "katakana", "sub": "가타카나 청음", "jp": "ト", "reading": "to", "kr": "토 (to)"}, {"id": 125, "category": "katakana", "sub": "가타카나 청음", "jp": "ナ", "reading": "na", "kr": "나 (na)"}, {"id": 126, "category": "katakana", "sub": "가타카나 청음", "jp": "ニ", "reading": "ni", "kr": "니 (ni)"}, {"id": 127, "category": "katakana", "sub": "가타카나 청음", "jp": "ヌ", "reading": "nu", "kr": "누 (nu)"}, {"id": 128, "category": "katakana", "sub": "가타카나 청음", "jp": "ネ", "reading": "ne", "kr": "네 (ne)"}, {"id": 129, "category": "katakana", "sub": "가타카나 청음", "jp": "ノ", "reading": "no", "kr": "노 (no)"}, {"id": 130, "category": "katakana", "sub": "가타카나 청음", "jp": "ハ", "reading": "ha", "kr": "하 (ha)"}, {"id": 131, "category": "katakana", "sub": "가타카나 청음", "jp": "ヒ", "reading": "hi", "kr": "히 (hi)"}, {"id": 132, "category": "katakana", "sub": "가타카나 청음", "jp": "フ", "reading": "fu", "kr": "후 (fu)"}, {"id": 133, "category": "katakana", "sub": "가타카나 청음", "jp": "ヘ", "reading": "he", "kr": "헤 (he)"}, {"id": 134, "category": "katakana", "sub": "가타카나 청음", "jp": "ホ", "reading": "ho", "kr": "호 (ho)"}, {"id": 135, "category": "katakana", "sub": "가타카나 청음", "jp": "マ", "reading": "ma", "kr": "마 (ma)"}, {"id": 136, "category": "katakana", "sub": "가타카나 청음", "jp": "ミ", "reading": "mi", "kr": "미 (mi)"}, {"id": 137, "category": "katakana", "sub": "가타카나 청음", "jp": "ム", "reading": "mu", "kr": "무 (mu)"}, {"id": 138, "category": "katakana", "sub": "가타카나 청음", "jp": "メ", "reading": "me", "kr": "메 (me)"}, {"id": 139, "category": "katakana", "sub": "가타카나 청음", "jp": "モ", "reading": "mo", "kr": "모 (mo)"}, {"id": 140, "category": "katakana", "sub": "가타카나 청음", "jp": "ヤ", "reading": "ya", "kr": "야 (ya)"}, {"id": 141, "category": "katakana", "sub": "가타카나 청음", "jp": "ユ", "reading": "yu", "kr": "유 (yu)"}, {"id": 142, "category": "katakana", "sub": "가타카나 청음", "jp": "ヨ", "reading": "yo", "kr": "요 (yo)"}, {"id": 143, "category": "katakana", "sub": "가타카나 청음", "jp": "ラ", "reading": "ra", "kr": "라 (ra)"}, {"id": 144, "category": "katakana", "sub": "가타카나 청음", "jp": "リ", "reading": "ri", "kr": "리 (ri)"}, {"id": 145, "category": "katakana", "sub": "가타카나 청음", "jp": "ル", "reading": "ru", "kr": "루 (ru)"}, {"id": 146, "category": "katakana", "sub": "가타카나 청음", "jp": "レ", "reading": "re", "kr": "레 (re)"}, {"id": 147, "category": "katakana", "sub": "가타카나 청음", "jp": "ロ", "reading": "ro", "kr": "로 (ro)"}, {"id": 148, "category": "katakana", "sub": "가타카나 청음", "jp": "ワ", "reading": "wa", "kr": "와 (wa)"}, {"id": 149, "category": "katakana", "sub": "가타카나 청음", "jp": "ヲ", "reading": "wo", "kr": "오 (wo)"}, {"id": 150, "category": "katakana", "sub": "가타카나 청음", "jp": "ン", "reading": "n", "kr": "응 (n)"}, {"id": 151, "category": "katakana", "sub": "가타카나 탁음·반탁음", "jp": "ガ", "reading": "ga", "kr": "가 (ga)"}, {"id": 152, "category": "katakana", "sub": "가타카나 탁음·반탁음", "jp": "ギ", "reading": "gi", "kr": "기 (gi)"}, {"id": 153, "category": "katakana", "sub": "가타카나 탁음·반탁음", "jp": "グ", "reading": "gu", "kr": "구 (gu)"}, {"id": 154, "category": "katakana", "sub": "가타카나 탁음·반탁음", "jp": "ゲ", "reading": "ge", "kr": "게 (ge)"}, {"id": 155, "category": "katakana", "sub": "가타카나 탁음·반탁음", "jp": "ゴ", "reading": "go", "kr": "고 (go)"}, {"id": 156, "category": "katakana", "sub": "가타카나 탁음·반탁음", "jp": "ザ", "reading": "za", "kr": "자 (za)"}, {"id": 157, "category": "katakana", "sub": "가타카나 탁음·반탁음", "jp": "ジ", "reading": "ji", "kr": "지 (ji)"}, {"id": 158, "category": "katakana", "sub": "가타카나 탁음·반탁음", "jp": "ズ", "reading": "zu", "kr": "즈 (zu)"}, {"id": 159, "category": "katakana", "sub": "가타카나 탁음·반탁음", "jp": "ゼ", "reading": "ze", "kr": "제 (ze)"}, {"id": 160, "category": "katakana", "sub": "가타카나 탁음·반탁음", "jp": "ゾ", "reading": "zo", "kr": "조 (zo)"}, {"id": 161, "category": "katakana", "sub": "가타카나 탁음·반탁음", "jp": "ダ", "reading": "da", "kr": "다 (da)"}, {"id": 162, "category": "katakana", "sub": "가타카나 탁음·반탁음", "jp": "ヂ", "reading": "ji", "kr": "지 (ji)"}, {"id": 163, "category": "katakana", "sub": "가타카나 탁음·반탁음", "jp": "ヅ", "reading": "zu", "kr": "즈 (zu)"}, {"id": 164, "category": "katakana", "sub": "가타카나 탁음·반탁음", "jp": "デ", "reading": "de", "kr": "데 (de)"}, {"id": 165, "category": "katakana", "sub": "가타카나 탁음·반탁음", "jp": "ド", "reading": "do", "kr": "도 (do)"}, {"id": 166, "category": "katakana", "sub": "가타카나 탁음·반탁음", "jp": "バ", "reading": "ba", "kr": "바 (ba)"}, {"id": 167, "category": "katakana", "sub": "가타카나 탁음·반탁음", "jp": "ビ", "reading": "bi", "kr": "비 (bi)"}, {"id": 168, "category": "katakana", "sub": "가타카나 탁음·반탁음", "jp": "ブ", "reading": "bu", "kr": "부 (bu)"}, {"id": 169, "category": "katakana", "sub": "가타카나 탁음·반탁음", "jp": "ベ", "reading": "be", "kr": "베 (be)"}, {"id": 170, "category": "katakana", "sub": "가타카나 탁음·반탁음", "jp": "ボ", "reading": "bo", "kr": "보 (bo)"}, {"id": 171, "category": "katakana", "sub": "가타카나 탁음·반탁음", "jp": "パ", "reading": "pa", "kr": "파 (pa)"}, {"id": 172, "category": "katakana", "sub": "가타카나 탁음·반탁음", "jp": "ピ", "reading": "pi", "kr": "피 (pi)"}, {"id": 173, "category": "katakana", "sub": "가타카나 탁음·반탁음", "jp": "プ", "reading": "pu", "kr": "푸 (pu)"}, {"id": 174, "category": "katakana", "sub": "가타카나 탁음·반탁음", "jp": "ペ", "reading": "pe", "kr": "페 (pe)"}, {"id": 175, "category": "katakana", "sub": "가타카나 탁음·반탁음", "jp": "ポ", "reading": "po", "kr": "포 (po)"}, {"id": 176, "category": "katakana", "sub": "가타카나 요음", "jp": "キャ", "reading": "kya", "kr": "캬 (kya)"}, {"id": 177, "category": "katakana", "sub": "가타카나 요음", "jp": "キュ", "reading": "kyu", "kr": "큐 (kyu)"}, {"id": 178, "category": "katakana", "sub": "가타카나 요음", "jp": "キョ", "reading": "kyo", "kr": "쿄 (kyo)"}, {"id": 179, "category": "katakana", "sub": "가타카나 요음", "jp": "シャ", "reading": "sha", "kr": "샤 (sha)"}, {"id": 180, "category": "katakana", "sub": "가타카나 요음", "jp": "シュ", "reading": "shu", "kr": "슈 (shu)"}, {"id": 181, "category": "katakana", "sub": "가타카나 요음", "jp": "ショ", "reading": "sho", "kr": "쇼 (sho)"}, {"id": 182, "category": "katakana", "sub": "가타카나 요음", "jp": "チャ", "reading": "cha", "kr": "차 (cha)"}, {"id": 183, "category": "katakana", "sub": "가타카나 요음", "jp": "チュ", "reading": "chu", "kr": "추 (chu)"}, {"id": 184, "category": "katakana", "sub": "가타카나 요음", "jp": "チョ", "reading": "cho", "kr": "초 (cho)"}, {"id": 185, "category": "katakana", "sub": "가타카나 요음", "jp": "ニャ", "reading": "nya", "kr": "냐 (nya)"}, {"id": 186, "category": "katakana", "sub": "가타카나 요음", "jp": "ニュ", "reading": "nyu", "kr": "뉴 (nyu)"}, {"id": 187, "category": "katakana", "sub": "가타카나 요음", "jp": "ニョ", "reading": "nyo", "kr": "뇨 (nyo)"}, {"id": 188, "category": "katakana", "sub": "가타카나 요음", "jp": "ヒャ", "reading": "hya", "kr": "햐 (hya)"}, {"id": 189, "category": "katakana", "sub": "가타카나 요음", "jp": "ヒュ", "reading": "hyu", "kr": "휴 (hyu)"}, {"id": 190, "category": "katakana", "sub": "가타카나 요음", "jp": "ヒョ", "reading": "hyo", "kr": "효 (hyo)"}, {"id": 191, "category": "katakana", "sub": "가타카나 요음", "jp": "ミャ", "reading": "mya", "kr": "먀 (mya)"}, {"id": 192, "category": "katakana", "sub": "가타카나 요음", "jp": "ミュ", "reading": "myu", "kr": "뮤 (myu)"}, {"id": 193, "category": "katakana", "sub": "가타카나 요음", "jp": "ミョ", "reading": "myo", "kr": "묘 (myo)"}, {"id": 194, "category": "katakana", "sub": "가타카나 요음", "jp": "リャ", "reading": "rya", "kr": "랴 (rya)"}, {"id": 195, "category": "katakana", "sub": "가타카나 요음", "jp": "リュ", "reading": "ryu", "kr": "류 (ryu)"}, {"id": 196, "category": "katakana", "sub": "가타카나 요음", "jp": "リョ", "reading": "ryo", "kr": "료 (ryo)"}, {"id": 197, "category": "katakana", "sub": "가타카나 요음", "jp": "ギャ", "reading": "gya", "kr": "갸 (gya)"}, {"id": 198, "category": "katakana", "sub": "가타카나 요음", "jp": "ギュ", "reading": "gyu", "kr": "규 (gyu)"}, {"id": 199, "category": "katakana", "sub": "가타카나 요음", "jp": "ギョ", "reading": "gyo", "kr": "교 (gyo)"}, {"id": 200, "category": "katakana", "sub": "가타카나 요음", "jp": "ジャ", "reading": "ja", "kr": "자 (ja)"}, {"id": 201, "category": "katakana", "sub": "가타카나 요음", "jp": "ジュ", "reading": "ju", "kr": "주 (ju)"}, {"id": 202, "category": "katakana", "sub": "가타카나 요음", "jp": "ジョ", "reading": "jo", "kr": "조 (jo)"}, {"id": 203, "category": "katakana", "sub": "가타카나 요음", "jp": "ビャ", "reading": "bya", "kr": "뱌 (bya)"}, {"id": 204, "category": "katakana", "sub": "가타카나 요음", "jp": "ビュ", "reading": "byu", "kr": "뷰 (byu)"}, {"id": 205, "category": "katakana", "sub": "가타카나 요음", "jp": "ビョ", "reading": "byo", "kr": "뵤 (byo)"}, {"id": 206, "category": "katakana", "sub": "가타카나 요음", "jp": "ピャ", "reading": "pya", "kr": "퍄 (pya)"}, {"id": 207, "category": "katakana", "sub": "가타카나 요음", "jp": "ピュ", "reading": "pyu", "kr": "퓨 (pyu)"}, {"id": 208, "category": "katakana", "sub": "가타카나 요음", "jp": "ピョ", "reading": "pyo", "kr": "표 (pyo)"}, {"id": 209, "category": "rule", "sub": "장음", "jp": "おかあさん", "reading": "okaasan", "kr": "어머니", "note": "あ단 + あ → 길게 늘인 '아ー' 소리(장음)", "example": "おかあさんは やさしいです。", "exampleKr": "어머니는 친절합니다."}, {"id": 210, "category": "rule", "sub": "장음", "jp": "おにいさん", "reading": "oniisan", "kr": "형/오빠", "note": "い단 + い → 길게 늘인 '이ー' 소리(장음)", "example": "おにいさんは がくせいです。", "exampleKr": "형(오빠)은 학생입니다."}, {"id": 211, "category": "rule", "sub": "장음", "jp": "くうき", "reading": "kuuki", "kr": "공기", "note": "う단 + う → 길게 늘인 '우ー' 소리(장음)", "example": "くうきが きれいです。", "exampleKr": "공기가 깨끗합니다."}, {"id": 212, "category": "rule", "sub": "장음", "jp": "せんせい", "reading": "sensee", "kr": "선생님", "note": "え단 다음 い → 길게 늘인 '에ー' 소리(보통 えい로 표기)", "example": "せんせいに あいます。", "exampleKr": "선생님을 만납니다."}, {"id": 213, "category": "rule", "sub": "장음", "jp": "おとうさん", "reading": "otoosan", "kr": "아버지", "note": "お단 다음 う → 길게 늘인 '오ー' 소리(장음)", "example": "おとうさんは いそがしいです。", "exampleKr": "아버지는 바쁩니다."}, {"id": 214, "category": "rule", "sub": "장음", "jp": "コーヒー", "reading": "koohii", "kr": "커피", "note": "가타카나는 'ー' 기호로 장음을 표기합니다", "example": "コーヒーを のみます。", "exampleKr": "커피를 마십니다."}, {"id": 215, "category": "rule", "sub": "촉음", "jp": "きっぷ", "reading": "kippu", "kr": "표/티켓", "note": "작은 'っ'은 다음 자음을 한 박자 끊어 발음합니다", "example": "きっぷを かいます。", "exampleKr": "표를 삽니다."}, {"id": 216, "category": "rule", "sub": "촉음", "jp": "がっこう", "reading": "gakkoo", "kr": "학교", "note": "'っ' 다음 か행이 오면 'ㄱ' 소리를 한 번 끊습니다", "example": "がっこうへ いきます。", "exampleKr": "학교에 갑니다."}, {"id": 217, "category": "rule", "sub": "촉음", "jp": "ざっし", "reading": "zasshi", "kr": "잡지", "note": "'っ' 다음 さ행이 오면 's' 소리를 한 번 끊습니다", "example": "ざっしを よみます。", "exampleKr": "잡지를 읽습니다."}, {"id": 218, "category": "rule", "sub": "촉음", "jp": "いってきます", "reading": "ittekimasu", "kr": "다녀오겠습니다", "note": "외출할 때 쓰는 인사. 'って'에 촉음이 들어있습니다", "example": "いってきます！", "exampleKr": "다녀오겠습니다!"}, {"id": 219, "category": "vocab", "sub": "숫자", "jp": "ゼロ", "reading": "zero", "kr": "영(0)"}, {"id": 220, "category": "vocab", "sub": "숫자", "jp": "いち", "reading": "ichi", "kr": "일/하나"}, {"id": 221, "category": "vocab", "sub": "숫자", "jp": "に", "reading": "ni", "kr": "이/둘"}, {"id": 222, "category": "vocab", "sub": "숫자", "jp": "さん", "reading": "san", "kr": "삼/셋"}, {"id": 223, "category": "vocab", "sub": "숫자", "jp": "よん", "reading": "yon", "kr": "사/넷"}, {"id": 224, "category": "vocab", "sub": "숫자", "jp": "ご", "reading": "go", "kr": "오/다섯"}, {"id": 225, "category": "vocab", "sub": "숫자", "jp": "ろく", "reading": "roku", "kr": "육/여섯"}, {"id": 226, "category": "vocab", "sub": "숫자", "jp": "なな", "reading": "nana", "kr": "칠/일곱"}, {"id": 227, "category": "vocab", "sub": "숫자", "jp": "はち", "reading": "hachi", "kr": "팔/여덟"}, {"id": 228, "category": "vocab", "sub": "숫자", "jp": "きゅう", "reading": "kyuu", "kr": "구/아홉"}, {"id": 229, "category": "vocab", "sub": "숫자", "jp": "じゅう", "reading": "juu", "kr": "십/열"}, {"id": 230, "category": "vocab", "sub": "시간", "jp": "きょう", "reading": "kyoo", "kr": "오늘"}, {"id": 231, "category": "vocab", "sub": "시간", "jp": "あした", "reading": "ashita", "kr": "내일"}, {"id": 232, "category": "vocab", "sub": "시간", "jp": "きのう", "reading": "kinoo", "kr": "어제"}, {"id": 233, "category": "vocab", "sub": "시간", "jp": "いま", "reading": "ima", "kr": "지금"}, {"id": 234, "category": "vocab", "sub": "시간", "jp": "あさ", "reading": "asa", "kr": "아침"}, {"id": 235, "category": "vocab", "sub": "시간", "jp": "ひる", "reading": "hiru", "kr": "낮"}, {"id": 236, "category": "vocab", "sub": "시간", "jp": "よる", "reading": "yoru", "kr": "밤"}, {"id": 237, "category": "vocab", "sub": "시간", "jp": "まいにち", "reading": "mainichi", "kr": "매일"}, {"id": 238, "category": "vocab", "sub": "장소·교통", "jp": "えき", "reading": "eki", "kr": "역"}, {"id": 239, "category": "vocab", "sub": "장소·교통", "jp": "くうこう", "reading": "kuukoo", "kr": "공항"}, {"id": 240, "category": "vocab", "sub": "장소·교통", "jp": "ホテル", "reading": "hoteru", "kr": "호텔"}, {"id": 241, "category": "vocab", "sub": "장소·교통", "jp": "トイレ", "reading": "toire", "kr": "화장실"}, {"id": 242, "category": "vocab", "sub": "장소·교통", "jp": "ぎんこう", "reading": "ginkoo", "kr": "은행"}, {"id": 243, "category": "vocab", "sub": "장소·교통", "jp": "デパート", "reading": "depaato", "kr": "백화점"}, {"id": 244, "category": "vocab", "sub": "장소·교통", "jp": "コンビニ", "reading": "konbini", "kr": "편의점"}, {"id": 245, "category": "vocab", "sub": "장소·교통", "jp": "レストラン", "reading": "resutoran", "kr": "레스토랑"}, {"id": 246, "category": "vocab", "sub": "장소·교통", "jp": "みち", "reading": "michi", "kr": "길/거리"}, {"id": 247, "category": "vocab", "sub": "장소·교통", "jp": "でぐち", "reading": "deguchi", "kr": "출구"}, {"id": 248, "category": "vocab", "sub": "장소·교통", "jp": "いりぐち", "reading": "iriguchi", "kr": "입구"}, {"id": 249, "category": "vocab", "sub": "음식·음료", "jp": "みず", "reading": "mizu", "kr": "물"}, {"id": 250, "category": "vocab", "sub": "음식·음료", "jp": "おちゃ", "reading": "ocha", "kr": "차"}, {"id": 251, "category": "vocab", "sub": "음식·음료", "jp": "パン", "reading": "pan", "kr": "빵"}, {"id": 252, "category": "vocab", "sub": "음식·음료", "jp": "ごはん", "reading": "gohan", "kr": "밥"}, {"id": 253, "category": "vocab", "sub": "음식·음료", "jp": "さかな", "reading": "sakana", "kr": "생선"}, {"id": 254, "category": "vocab", "sub": "음식·음료", "jp": "にく", "reading": "niku", "kr": "고기"}, {"id": 255, "category": "vocab", "sub": "음식·음료", "jp": "やさい", "reading": "yasai", "kr": "채소"}, {"id": 256, "category": "vocab", "sub": "음식·음료", "jp": "くだもの", "reading": "kudamono", "kr": "과일"}, {"id": 257, "category": "vocab", "sub": "음식·음료", "jp": "たまご", "reading": "tamago", "kr": "계란"}, {"id": 258, "category": "vocab", "sub": "음식·음료", "jp": "ラーメン", "reading": "raamen", "kr": "라멘"}, {"id": 259, "category": "vocab", "sub": "사람·소지품", "jp": "わたし", "reading": "watashi", "kr": "저/나"}, {"id": 260, "category": "vocab", "sub": "사람·소지품", "jp": "あなた", "reading": "anata", "kr": "당신"}, {"id": 261, "category": "vocab", "sub": "사람·소지품", "jp": "ともだち", "reading": "tomodachi", "kr": "친구"}, {"id": 262, "category": "vocab", "sub": "사람·소지품", "jp": "かぞく", "reading": "kazoku", "kr": "가족"}, {"id": 263, "category": "vocab", "sub": "사람·소지품", "jp": "パスポート", "reading": "pasupooto", "kr": "여권"}, {"id": 264, "category": "vocab", "sub": "사람·소지품", "jp": "おかね", "reading": "okane", "kr": "돈"}, {"id": 265, "category": "vocab", "sub": "사람·소지품", "jp": "かばん", "reading": "kaban", "kr": "가방"}, {"id": 266, "category": "vocab", "sub": "사람·소지품", "jp": "けいたい", "reading": "keitai", "kr": "휴대폰"}, {"id": 267, "category": "vocab", "sub": "상태·형용사", "jp": "おおきい", "reading": "ookii", "kr": "크다"}, {"id": 268, "category": "vocab", "sub": "상태·형용사", "jp": "ちいさい", "reading": "chiisai", "kr": "작다"}, {"id": 269, "category": "vocab", "sub": "상태·형용사", "jp": "たかい", "reading": "takai", "kr": "높다/비싸다"}, {"id": 270, "category": "vocab", "sub": "상태·형용사", "jp": "やすい", "reading": "yasui", "kr": "싸다"}, {"id": 271, "category": "vocab", "sub": "상태·형용사", "jp": "あつい", "reading": "atsui", "kr": "덥다/뜨겁다"}, {"id": 272, "category": "vocab", "sub": "상태·형용사", "jp": "さむい", "reading": "samui", "kr": "춥다"}, {"id": 273, "category": "vocab", "sub": "상태·형용사", "jp": "おいしい", "reading": "oishii", "kr": "맛있다"}, {"id": 274, "category": "vocab", "sub": "상태·형용사", "jp": "たのしい", "reading": "tanoshii", "kr": "즐겁다"}, {"id": 275, "category": "vocab", "sub": "상태·형용사", "jp": "いそがしい", "reading": "isogashii", "kr": "바쁘다"}, {"id": 276, "category": "vocab", "sub": "상태·형용사", "jp": "げんき", "reading": "genki", "kr": "건강한/잘 지내는"}, {"id": 277, "category": "phrase", "sub": "인사", "jp": "おはようございます", "reading": "ohayoo gozaimasu", "kr": "좋은 아침입니다"}, {"id": 278, "category": "phrase", "sub": "인사", "jp": "こんにちは", "reading": "konnichiwa", "kr": "안녕하세요(낮)"}, {"id": 279, "category": "phrase", "sub": "인사", "jp": "こんばんは", "reading": "konbanwa", "kr": "안녕하세요(저녁)"}, {"id": 280, "category": "phrase", "sub": "인사", "jp": "さようなら", "reading": "sayoonara", "kr": "안녕히 가세요"}, {"id": 281, "category": "phrase", "sub": "인사", "jp": "おやすみなさい", "reading": "oyasumi nasai", "kr": "잘 자요"}, {"id": 282, "category": "phrase", "sub": "인사", "jp": "はじめまして", "reading": "hajimemashite", "kr": "처음 뵙겠습니다"}, {"id": 283, "category": "phrase", "sub": "인사", "jp": "よろしくおねがいします", "reading": "yoroshiku onegai shimasu", "kr": "잘 부탁합니다"}, {"id": 284, "category": "phrase", "sub": "감사·사과", "jp": "ありがとうございます", "reading": "arigatoo gozaimasu", "kr": "감사합니다"}, {"id": 285, "category": "phrase", "sub": "감사·사과", "jp": "すみません", "reading": "sumimasen", "kr": "실례합니다/죄송합니다"}, {"id": 286, "category": "phrase", "sub": "감사·사과", "jp": "だいじょうぶです", "reading": "daijoobu desu", "kr": "괜찮습니다"}, {"id": 287, "category": "phrase", "sub": "감사·사과", "jp": "ごめんなさい", "reading": "gomen nasai", "kr": "미안합니다"}, {"id": 288, "category": "phrase", "sub": "식당", "jp": "これをください", "reading": "kore o kudasai", "kr": "이것을 주세요"}, {"id": 289, "category": "phrase", "sub": "식당", "jp": "メニューをみせてください", "reading": "menyuu o misete kudasai", "kr": "메뉴를 보여주세요"}, {"id": 290, "category": "phrase", "sub": "식당", "jp": "おすすめはなんですか", "reading": "osusume wa nan desu ka", "kr": "추천 메뉴는 무엇입니까"}, {"id": 291, "category": "phrase", "sub": "식당", "jp": "からくないものをください", "reading": "karakunai mono o kudasai", "kr": "맵지 않은 것을 주세요"}, {"id": 292, "category": "phrase", "sub": "식당", "jp": "いただきます", "reading": "itadakimasu", "kr": "잘 먹겠습니다"}, {"id": 293, "category": "phrase", "sub": "식당", "jp": "ごちそうさまでした", "reading": "gochisoosama deshita", "kr": "잘 먹었습니다"}, {"id": 294, "category": "phrase", "sub": "식당", "jp": "おかいけいをおねがいします", "reading": "okaikei o onegai shimasu", "kr": "계산을 부탁합니다"}, {"id": 295, "category": "phrase", "sub": "쇼핑", "jp": "これはいくらですか", "reading": "kore wa ikura desu ka", "kr": "이것은 얼마입니까"}, {"id": 296, "category": "phrase", "sub": "쇼핑", "jp": "カードではらえますか", "reading": "kaado de haraemasu ka", "kr": "카드로 결제할 수 있나요"}, {"id": 297, "category": "phrase", "sub": "쇼핑", "jp": "ふくろをください", "reading": "fukuro o kudasai", "kr": "봉투를 주세요"}, {"id": 298, "category": "phrase", "sub": "쇼핑", "jp": "やすくなりますか", "reading": "yasuku narimasu ka", "kr": "싸게 해주실 수 있나요"}, {"id": 299, "category": "phrase", "sub": "교통·길찾기", "jp": "トイレはどこですか", "reading": "toire wa doko desu ka", "kr": "화장실은 어디입니까"}, {"id": 300, "category": "phrase", "sub": "교통·길찾기", "jp": "えきまでおねがいします", "reading": "eki made onegai shimasu", "kr": "역까지 부탁합니다"}, {"id": 301, "category": "phrase", "sub": "교통·길찾기", "jp": "きっぷをにまいください", "reading": "kippu o nimai kudasai", "kr": "표를 두 장 주세요"}, {"id": 302, "category": "phrase", "sub": "교통·길찾기", "jp": "タクシーをよんでください", "reading": "takushii o yonde kudasai", "kr": "택시를 불러주세요"}, {"id": 303, "category": "phrase", "sub": "숙박", "jp": "チェックインをおねがいします", "reading": "chekkuin o onegai shimasu", "kr": "체크인을 부탁합니다"}, {"id": 304, "category": "phrase", "sub": "숙박", "jp": "チェックアウトはなんじですか", "reading": "chekkuauto wa nanji desu ka", "kr": "체크아웃은 몇 시입니까"}, {"id": 305, "category": "phrase", "sub": "숙박", "jp": "ワイファイはありますか", "reading": "waifai wa arimasu ka", "kr": "와이파이 있나요"}, {"id": 306, "category": "phrase", "sub": "숙박", "jp": "へやをかえてもらえますか", "reading": "heya o kaete moraemasu ka", "kr": "방을 바꿔 주실 수 있나요"}, {"id": 307, "category": "phrase", "sub": "긴급상황", "jp": "たすけてください", "reading": "tasukete kudasai", "kr": "도와주세요"}, {"id": 308, "category": "phrase", "sub": "긴급상황", "jp": "びょういんはどこですか", "reading": "byooin wa doko desu ka", "kr": "병원은 어디입니까"}, {"id": 309, "category": "phrase", "sub": "긴급상황", "jp": "けいさつをよんでください", "reading": "keisatsu o yonde kudasai", "kr": "경찰을 불러주세요"}, {"id": 310, "category": "phrase", "sub": "긴급상황", "jp": "パスポートをなくしました", "reading": "pasupooto o nakushimashita", "kr": "여권을 잃어버렸어요"}, {"id": 311, "category": "phrase", "sub": "긴급상황", "jp": "にほんごがすこしわかります", "reading": "nihongo ga sukoshi wakarimasu", "kr": "일본어를 조금 압니다"}, {"id": 312, "category": "phrase", "sub": "긴급상황", "jp": "えいごをはなせますか", "reading": "eigo o hanasemasu ka", "kr": "영어를 할 수 있습니까"}];
 
-const wordData = [
-  ["기본","わたし","watashi","나"],["기본","あなた","anata","당신"],["기본","ともだち","tomodachi","친구"],["기본","せんせい","sensei","선생님"],["기본","がくせい","gakusei","학생"],
-  ["생활","いま","ima","지금"],["생활","きょう","kyou","오늘"],["생활","あした","ashita","내일"],["생활","ここ","koko","여기"],["생활","そこ","soko","거기"],
-  ["생활","みず","mizu","물"],["생활","ごはん","gohan","밥"],["생활","でんわ","denwa","전화"],["생활","くるま","kuruma","자동차"],["생활","おかね","okane","돈"],
-  ["회사","かいしゃ","kaisha","회사"],["회사","しごと","shigoto","일"],["회사","じかん","jikan","시간"],["회사","かいぎ","kaigi","회의"],["회사","メール","meeru","메일"],
-  ["동사","いく","iku","가다"],["동사","くる","kuru","오다"],["동사","みる","miru","보다"],["동사","たべる","taberu","먹다"],["동사","する","suru","하다"],
-  ["표현","はい","hai","네"],["표현","いいえ","iie","아니요"],["표현","ありがとう","arigatou","고마워"],["표현","すみません","sumimasen","죄송합니다/실례합니다"],["표현","おはよう","ohayou","좋은 아침"]
-];
+const CATEGORY_COLOR = { hiragana:'var(--kin)', katakana:'var(--ao)', rule:'var(--sumi)', vocab:'var(--ai)', phrase:'var(--inkan-deep)' };
+const PROGRESS_KEY = 'kanaTravelProgress_v1';
 
-let kanaMode="choice", currentKanaList=[], currentKana=null;
-let kanaWrong=JSON.parse(localStorage.getItem("kanaWrongItems")||"[]");
-let kanaStats=JSON.parse(localStorage.getItem("kanaStats")||'{"solved":0,"correct":0,"seen":[]}');
-
-let wordMode="meaning", currentWordList=[], currentWord=null;
-let wordWrong=JSON.parse(localStorage.getItem("wordWrongItems")||"[]");
-let wordStats=JSON.parse(localStorage.getItem("wordStats")||'{"solved":0,"correct":0,"seen":[]}');
-
-function switchTab(tab){
-  document.getElementById("kanaSection").classList.toggle("hide", tab!=="kana");
-  document.getElementById("wordSection").classList.toggle("hide", tab!=="word");
-  document.getElementById("kanaTab").classList.toggle("active", tab==="kana");
-  document.getElementById("wordTab").classList.toggle("active", tab==="word");
-  updateKanaStats(); updateWordStats();
+function loadProgress(){
+  try{
+    const raw = localStorage.getItem(PROGRESS_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch(e){ return {}; }
 }
-function shuffle(arr){return [...arr].sort(()=>Math.random()-0.5)}
-function speakText(text){
-  if(!("speechSynthesis" in window)){alert("이 기기에서는 음성 기능을 지원하지 않을 수 있어요.");return;}
-  speechSynthesis.cancel();
-  const msg=new SpeechSynthesisUtterance(text); msg.lang="ja-JP"; msg.rate=.75; speechSynthesis.speak(msg);
+function saveProgress(){
+  try{ localStorage.setItem(PROGRESS_KEY, JSON.stringify(results)); } catch(e){ /* storage unavailable */ }
+}
+function resetAllProgress(){
+  if(!confirm('전체 학습 진도와 정답 기록을 초기화할까요? 되돌릴 수 없어요.')) return;
+  results = {};
+  try{ localStorage.removeItem(PROGRESS_KEY); } catch(e){}
+  buildDeck();
 }
 
-/* KANA */
-function selectedRange(){return document.querySelector('input[name="range"]:checked').value}
-function kanaForRange(){return kanaData[selectedRange()].map(x=>({kana:x[0],roma:x[1],sound:x[2],key:selectedRange()+"|"+x[0]+"|"+x[1]}))}
-function saveKana(){localStorage.setItem("kanaWrongItems",JSON.stringify(kanaWrong));localStorage.setItem("kanaStats",JSON.stringify(kanaStats))}
-function updateKanaStats(){
-  const total=kanaForRange().length; document.getElementById("totalCount").textContent=total;
-  document.getElementById("solvedCount").textContent=kanaStats.solved; document.getElementById("correctCount").textContent=kanaStats.correct;
-  document.getElementById("rateCount").textContent=(kanaStats.solved?Math.round(kanaStats.correct/kanaStats.solved*100):0)+"%";
-  const seen=kanaStats.seen.filter(k=>k.startsWith(selectedRange()+"|")).length; document.getElementById("progressBar").style.width=Math.min(100,Math.round(seen/total*100))+"%";
-  renderKanaWrong();
+let activeSub = null;
+let mode = 'flip';
+let deck = [];
+let idx = 0;
+let isFlipped = false;
+let results = loadProgress();
+let quizPool = [];
+let quizIdx = 0;
+let quizAnswered = false;
+
+function buildSubList(){
+  const subs = {};
+  const order = [];
+  DECK.forEach(c=>{
+    const key = c.category+'::'+c.sub;
+    if(!subs[key]){ subs[key] = {category:c.category, sub:c.sub, count:0}; order.push(key); }
+    subs[key].count++;
+  });
+  return order.map(k=>subs[k]);
 }
-function startKanaQuiz(m){kanaMode=m;currentKanaList=kanaForRange();nextKanaQuestion();updateKanaStats()}
-function startKanaWrongQuiz(){currentKanaList=kanaWrong.filter(x=>x.key.startsWith(selectedRange()+"|")); if(!currentKanaList.length){alert("현재 선택한 범위에는 오답이 없어요 😊");return;} kanaMode="choice"; nextKanaQuestion()}
-function nextKanaQuestion(){
-  currentKana=currentKanaList[Math.floor(Math.random()*currentKanaList.length)];
-  let html=`<div class="kana">${currentKana.kana}</div><div class="hint">이 글자의 로마자 발음은?</div><div class="btns" style="justify-content:center;"><button class="light" onclick="speakText('${currentKana.kana}')">🔊 발음 듣기</button><button class="secondary" onclick="nextKanaQuestion()">다음 문제</button></div>`;
-  if(kanaMode==="typing"){
-    html+=`<div style="margin-top:14px;"><input type="text" id="answerInput" placeholder="예: a, ka, shi" onkeydown="if(event.key==='Enter') checkKanaTyping()"/></div><div class="btns" style="justify-content:center;"><button onclick="checkKanaTyping()">정답 확인</button></div><div class="result" id="result"></div>`;
-  }else{
-    let opts=shuffle(kanaForRange().filter(x=>x.roma!==currentKana.roma)).slice(0,3).map(x=>x.roma); opts=shuffle([...opts,currentKana.roma]);
-    html+=`<div class="choice-grid">${opts.map(o=>`<button class="choice" onclick="checkKanaChoice('${o}')">${o}</button>`).join("")}</div><div class="result" id="result"></div>`;
+
+function renderChips(){
+  const wrap = document.getElementById('categoryChips');
+  wrap.innerHTML = '';
+  const allChip = document.createElement('button');
+  allChip.className = 'chip active';
+  allChip.textContent = '전체 (' + DECK.length + ')';
+  allChip.onclick = ()=>{ setFilter(null); highlightChip(allChip); };
+  wrap.appendChild(allChip);
+
+  const subs = buildSubList();
+  subs.forEach(s=>{
+    const chip = document.createElement('button');
+    chip.className = 'chip';
+    chip.textContent = s.sub + ' (' + s.count + ')';
+    chip.dataset.cat = s.category;
+    chip.onclick = ()=>{ setFilter(s); highlightChip(chip); };
+    wrap.appendChild(chip);
+  });
+
+  function highlightChip(target){
+    [...wrap.children].forEach(c=>{ c.classList.remove('active','cat-hiragana','cat-katakana','cat-rule','cat-vocab','cat-phrase'); });
+    target.classList.add('active');
+    if(target.dataset.cat) target.classList.add('cat-'+target.dataset.cat);
   }
-  document.getElementById("quizArea").innerHTML=html; const inp=document.getElementById("answerInput"); if(inp) inp.focus();
-}
-function recordKana(ok){kanaStats.solved++; if(ok) kanaStats.correct++; if(!kanaStats.seen.includes(currentKana.key)) kanaStats.seen.push(currentKana.key); if(ok) kanaWrong=kanaWrong.filter(x=>x.key!==currentKana.key); else if(!kanaWrong.some(x=>x.key===currentKana.key)) kanaWrong.push(currentKana); saveKana(); updateKanaStats()}
-function checkKanaChoice(a){let ok=a===currentKana.roma;recordKana(ok);document.getElementById("result").innerHTML=ok?`<span class="ok">정답 🎉 ${currentKana.kana} = ${currentKana.roma} / ${currentKana.sound}</span>`:`<span class="no">오답 😢 정답: ${currentKana.roma} / ${currentKana.sound}</span>`}
-function checkKanaTyping(){let val=document.getElementById("answerInput").value.trim().toLowerCase();let ok=val===currentKana.roma.toLowerCase();recordKana(ok);document.getElementById("result").innerHTML=ok?`<span class="ok">정답 🎉 ${currentKana.kana} = ${currentKana.roma} / ${currentKana.sound}</span>`:`<span class="no">오답 😢 정답: ${currentKana.roma} / ${currentKana.sound}</span>`}
-function renderKanaWrong(){const list=kanaWrong.filter(x=>x.key.startsWith(selectedRange()+"|"));document.getElementById("wrongQuizBtn").disabled=list.length===0;document.getElementById("wrongList").innerHTML=list.length?list.map(x=>`<span class="wrong-item">${x.kana} = ${x.roma}</span>`).join(""):`<span class="small">현재 선택한 범위에는 오답이 없어요 👍</span>`}
-function resetKanaStats(){if(confirm("가나 학습 진도와 오답노트를 초기화할까요?")){kanaStats={solved:0,correct:0,seen:[]};kanaWrong=[];saveKana();updateKanaStats();document.getElementById("quizArea").innerHTML=`<div class="hint">초기화 완료 😊 다시 시작해보세요!</div>`}}
-function showKanaTable(){const list=kanaForRange();document.getElementById("tableCard").style.display="block";document.getElementById("tableArea").innerHTML=`<table><thead><tr><th>글자</th><th>로마자</th><th>한글 발음</th><th>듣기</th></tr></thead><tbody>${list.map(x=>`<tr><td style="font-size:24px;font-weight:900;">${x.kana}</td><td>${x.roma}</td><td>${x.sound}</td><td><button class="light" onclick="speakText('${x.kana}')">🔊</button></td></tr>`).join("")}</tbody></table>`}
-
-/* WORD */
-function words(){return wordData.map((x,i)=>({cat:x[0],jp:x[1],roma:x[2],kr:x[3],key:"word|"+i+"|"+x[1]}))}
-function saveWord(){localStorage.setItem("wordWrongItems",JSON.stringify(wordWrong));localStorage.setItem("wordStats",JSON.stringify(wordStats))}
-function updateWordStats(){
-  const total=words().length; document.getElementById("wordTotal").textContent=total;
-  document.getElementById("wordSolved").textContent=wordStats.solved; document.getElementById("wordCorrect").textContent=wordStats.correct;
-  document.getElementById("wordRate").textContent=(wordStats.solved?Math.round(wordStats.correct/wordStats.solved*100):0)+"%";
-  document.getElementById("wordProgressBar").style.width=Math.min(100,Math.round(wordStats.seen.length/total*100))+"%";
-  renderWordWrong();
-}
-function startWordQuiz(m){wordMode=m;currentWordList=words();nextWordQuestion();updateWordStats()}
-function startWordWrongQuiz(){currentWordList=wordWrong; if(!currentWordList.length){alert("단어 오답이 없어요 😊");return;} wordMode="meaning"; nextWordQuestion()}
-function nextWordQuestion(){
-  currentWord=currentWordList[Math.floor(Math.random()*currentWordList.length)];
-  let title = wordMode==="meaning" ? currentWord.jp : currentWord.kr;
-  let question = wordMode==="meaning" ? "이 단어의 뜻은?" : "이 뜻에 맞는 일본어는?";
-  let correct = wordMode==="meaning" ? currentWord.kr : currentWord.jp;
-  let pool = words().filter(x => (wordMode==="meaning" ? x.kr!==correct : x.jp!==correct));
-  let opts = shuffle(pool).slice(0,3).map(x => wordMode==="meaning" ? x.kr : x.jp);
-  opts = shuffle([...opts, correct]);
-  document.getElementById("wordQuizArea").innerHTML = `
-    <div class="word-main">${title}</div>
-    <div class="hint">${question}</div>
-    <div class="btns" style="justify-content:center;">
-      <button class="light" onclick="speakText('${currentWord.jp}')">🔊 발음 듣기</button>
-      <button class="secondary" onclick="nextWordQuestion()">다음 문제</button>
-    </div>
-    <div class="choice-grid">${opts.map(o=>`<button class="choice" onclick="checkWordChoice('${String(o).replace(/'/g,"\\'")}')">${o}</button>`).join("")}</div>
-    <div class="result" id="wordResult"></div>
-  `;
-}
-function recordWord(ok){
-  wordStats.solved++; if(ok) wordStats.correct++;
-  if(!wordStats.seen.includes(currentWord.key)) wordStats.seen.push(currentWord.key);
-  if(ok) wordWrong=wordWrong.filter(x=>x.key!==currentWord.key); else if(!wordWrong.some(x=>x.key===currentWord.key)) wordWrong.push(currentWord);
-  saveWord(); updateWordStats();
-}
-function checkWordChoice(answer){
-  let correct = wordMode==="meaning" ? currentWord.kr : currentWord.jp;
-  let ok = answer === correct;
-  recordWord(ok);
-  document.getElementById("wordResult").innerHTML = ok
-    ? `<span class="ok">정답 🎉 ${currentWord.jp} (${currentWord.roma}) = ${currentWord.kr}</span>`
-    : `<span class="no">오답 😢 정답: ${correct}<br>${currentWord.jp} (${currentWord.roma}) = ${currentWord.kr}</span>`;
-}
-function renderWordWrong(){
-  document.getElementById("wordWrongBtn").disabled=wordWrong.length===0;
-  document.getElementById("wordWrongList").innerHTML=wordWrong.length?wordWrong.map(x=>`<span class="wrong-item">${x.jp} = ${x.kr}</span>`).join(""):`<span class="small">단어 오답이 없어요 👍</span>`;
-}
-function resetWordStats(){if(confirm("단어 학습 진도와 오답노트를 초기화할까요?")){wordStats={solved:0,correct:0,seen:[]};wordWrong=[];saveWord();updateWordStats();document.getElementById("wordQuizArea").innerHTML=`<div class="hint">초기화 완료 😊 다시 시작해보세요!</div>`}}
-function showWordList(){
-  document.getElementById("wordListCard").style.display="block";
-  document.getElementById("wordListArea").innerHTML=words().map(x=>`
-    <div class="word-card">
-      <span class="pill">${x.cat}</span>
-      <b>${x.jp}</b>
-      <div class="meaning">${x.kr}</div>
-      <div class="roma">${x.roma}</div>
-      <div class="btns"><button class="light" onclick="speakText('${x.jp}')">🔊 발음</button></div>
-    </div>
-  `).join("");
 }
 
-document.querySelectorAll('input[name="range"]').forEach(r=>r.addEventListener("change",()=>{updateKanaStats();document.getElementById("tableCard").style.display="none";document.getElementById("quizArea").innerHTML=`<div class="hint">범위가 변경됐어요. 시작 버튼을 눌러주세요 😊</div>`}));
-updateKanaStats(); updateWordStats();
+function setFilter(subFilter){
+  activeSub = subFilter;
+  buildDeck();
+}
+
+function buildDeck(){
+  if(activeSub){
+    deck = DECK.filter(c=>c.category===activeSub.category && c.sub===activeSub.sub);
+  } else {
+    deck = [...DECK];
+  }
+  idx = 0; isFlipped = false;
+  document.getElementById('completeScreen').style.display='none';
+  if(mode==='flip'){
+    document.getElementById('flipStage').style.display='block';
+    document.getElementById('quizStage').style.display='none';
+    renderCard();
+  } else {
+    document.getElementById('flipStage').style.display='none';
+    document.getElementById('quizStage').style.display='block';
+    buildQuizPool();
+    renderQuiz();
+  }
+  updateProgress();
+}
+
+function shuffleDeck(){
+  for(let i=deck.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [deck[i],deck[j]]=[deck[j],deck[i]]; }
+  idx = 0; isFlipped = false; renderCard();
+}
+
+function isKanaCategory(cat){ return cat==='hiragana' || cat==='katakana'; }
+
+function renderCard(){
+  if(deck.length===0) return;
+  if(idx>=deck.length){ showComplete(); return; }
+  const c = deck[idx];
+  const card = document.getElementById('card');
+  card.classList.remove('flipped');
+  isFlipped = false;
+  document.getElementById('stampMark').className = 'stamp-mark';
+
+  const tagF = document.getElementById('tagFront');
+  const tagB = document.getElementById('tagBack');
+  tagF.textContent = c.sub;
+  tagB.textContent = c.sub;
+  tagF.className = 'card-tag ' + c.category;
+  tagB.className = 'card-tag ' + c.category;
+
+  document.getElementById('counterFront').textContent = (idx+1)+' / '+deck.length;
+  document.getElementById('counterBack').textContent = (idx+1)+' / '+deck.length;
+
+  const jpEl = document.getElementById('jpFront');
+  jpEl.textContent = c.jp;
+  jpEl.className = 'card-jp';
+  if(isKanaCategory(c.category)) jpEl.classList.add('kana-glyph');
+  else if(c.jp.length>6) jpEl.classList.add('compact');
+
+  const readingFront = document.getElementById('readingFront');
+  if(isKanaCategory(c.category)){
+    readingFront.style.display='none';
+  } else {
+    readingFront.style.display='block';
+    readingFront.textContent = c.reading || '';
+  }
+
+  document.getElementById('krBack').textContent = c.kr;
+  document.getElementById('krBack').style.color = CATEGORY_COLOR[c.category] || 'var(--sumi)';
+
+  const readingBack = document.getElementById('readingBack');
+  if(isKanaCategory(c.category) && c.reading){
+    readingBack.style.display='block';
+    readingBack.textContent = c.reading;
+  } else {
+    readingBack.style.display='none';
+  }
+
+  const noteEl = document.getElementById('noteBack');
+  if(c.note){ noteEl.style.display='inline-block'; noteEl.textContent = c.note; }
+  else { noteEl.style.display='none'; }
+
+  const exBlock = document.getElementById('exampleBlock');
+  if(c.example){
+    exBlock.style.display='block';
+    document.getElementById('exampleJp').textContent = c.example;
+    document.getElementById('exampleKr').textContent = c.exampleKr || '';
+  } else {
+    exBlock.style.display='none';
+  }
+
+  document.getElementById('btnKnow').disabled=false;
+  document.getElementById('btnDontKnow').disabled=false;
+  document.getElementById('btnPrev').disabled = idx===0;
+}
+
+function flipCard(){
+  if(deck.length===0 || idx>=deck.length) return;
+  isFlipped = !isFlipped;
+  document.getElementById('card').classList.toggle('flipped', isFlipped);
+}
+
+function markAndAdvance(known){
+  if(deck.length===0 || idx>=deck.length) return;
+  const c = deck[idx];
+  results[c.id] = known ? 'correct' : 'wrong';
+  saveProgress();
+  if(!isFlipped){ isFlipped = true; document.getElementById('card').classList.add('flipped'); }
+  const stamp = document.getElementById('stampMark');
+  stamp.textContent = known ? '合' : '否';
+  stamp.className = 'stamp-mark ' + (known ? 'correct':'wrong');
+  updateProgress();
+  setTimeout(()=>{ idx++; renderCard(); }, known ? 420 : 520);
+}
+
+function goPrev(){ if(idx>0){ idx--; renderCard(); } }
+function goNext(){ if(idx<deck.length-1){ idx++; renderCard(); } else if(idx===deck.length-1){ idx++; showComplete(); } }
+
+function updateProgress(){
+  const total = deck.length;
+  const ids = new Set(deck.map(c=>String(c.id)));
+  const done = Object.keys(results).filter(id=>ids.has(String(id))).length;
+  const correct = Object.entries(results).filter(([id,r])=>ids.has(String(id)) && r==='correct').length;
+  const wrong = Object.entries(results).filter(([id,r])=>ids.has(String(id)) && r==='wrong').length;
+  document.getElementById('progressFill').style.width = total? (done/total*100)+'%' : '0%';
+  document.getElementById('progressCount').textContent = done + ' / ' + total;
+  document.getElementById('statCorrect').textContent = '✓ ' + correct;
+  document.getElementById('statWrong').textContent = '✗ ' + wrong;
+}
+
+function showComplete(){
+  document.getElementById('flipStage').style.display='none';
+  document.getElementById('quizStage').style.display='none';
+  const screen = document.getElementById('completeScreen');
+  screen.style.display='block';
+  const correct = Object.values(results).filter(r=>r==='correct').length;
+  const wrongIds = Object.keys(results).filter(id=>results[id]==='wrong');
+  document.getElementById('completeScore').textContent = correct + ' / ' + deck.length;
+
+  const wrongWrap = document.getElementById('wrongListWrap');
+  const wrongItemsEl = document.getElementById('wrongListItems');
+  if(wrongIds.length>0){
+    wrongWrap.style.display='block';
+    wrongItemsEl.innerHTML='';
+    wrongIds.forEach(wid=>{
+      const card = DECK.find(c=>String(c.id)===String(wid));
+      if(!card) return;
+      const row = document.createElement('div');
+      row.className='wrong-item';
+      row.innerHTML = '<span class="jp">'+card.jp+'</span><span class="kr">'+card.kr+'</span>';
+      wrongItemsEl.appendChild(row);
+    });
+    document.getElementById('btnRetryWrong').style.display='inline-block';
+  } else {
+    wrongWrap.style.display='none';
+    document.getElementById('btnRetryWrong').style.display='none';
+  }
+}
+
+function buildQuizPool(){
+  quizPool = [...deck];
+  for(let i=quizPool.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [quizPool[i],quizPool[j]]=[quizPool[j],quizPool[i]]; }
+  quizIdx = 0;
+}
+
+function renderQuiz(){
+  document.getElementById('flipStage').style.display='none';
+  document.getElementById('quizStage').style.display='block';
+  document.getElementById('completeScreen').style.display='none';
+  if(quizPool.length===0) return;
+  if(quizIdx>=quizPool.length){ showComplete(); return; }
+
+  quizAnswered = false;
+  const c = quizPool[quizIdx];
+  const tag = document.getElementById('quizTag');
+  tag.textContent = c.sub;
+  tag.className = 'card-tag ' + c.category;
+  tag.style.position='static'; tag.style.display='inline-block'; tag.style.marginBottom='14px';
+
+  const jpEl = document.getElementById('quizJp');
+  jpEl.textContent = c.jp;
+  jpEl.style.fontSize = isKanaCategory(c.category) ? '3.6rem' : (c.jp.length>6 ? '1.6rem':'2.8rem');
+  document.getElementById('quizReading').textContent = isKanaCategory(c.category) ? '' : (c.reading || '');
+
+  const pool = DECK.filter(x=>x.category===c.category && x.id!==c.id);
+  const distractors = [];
+  const used = new Set();
+  while(distractors.length<3 && used.size<pool.length){
+    const r = pool[Math.floor(Math.random()*pool.length)];
+    if(!used.has(r.id)){ used.add(r.id); distractors.push(r); }
+  }
+  const options = [c, ...distractors];
+  for(let i=options.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [options[i],options[j]]=[options[j],options[i]]; }
+
+  const optWrap = document.getElementById('quizOptions');
+  optWrap.innerHTML='';
+  options.forEach(opt=>{
+    const btn = document.createElement('button');
+    btn.className = 'quiz-opt';
+    btn.textContent = opt.kr;
+    btn.onclick = ()=> answerQuiz(opt.id===c.id, btn, c.id);
+    btn.dataset.id = opt.id;
+    optWrap.appendChild(btn);
+  });
+  document.getElementById('quizNextBtn').classList.remove('show');
+  updateProgress();
+}
+
+function answerQuiz(isCorrect, btnEl, correctId){
+  if(quizAnswered) return;
+  quizAnswered = true;
+  const c = quizPool[quizIdx];
+  results[c.id] = isCorrect ? 'correct' : 'wrong';
+  saveProgress();
+
+  document.querySelectorAll('.quiz-opt').forEach(b=>{
+    b.classList.add('disabled');
+    if(parseInt(b.dataset.id)===correctId){ b.classList.add('correct'); }
+    else if(b===btnEl){ b.classList.add('wrong'); }
+    else { b.classList.add('faded'); }
+  });
+  updateProgress();
+  document.getElementById('quizNextBtn').classList.add('show');
+}
+
+function nextQuiz(){ quizIdx++; renderQuiz(); }
+
+function setMode(newMode){
+  mode = newMode;
+  document.getElementById('modeFlip').classList.toggle('active', mode==='flip');
+  document.getElementById('modeQuiz').classList.toggle('active', mode==='quiz');
+  idx = 0;
+  document.getElementById('completeScreen').style.display='none';
+  if(mode==='flip'){
+    document.getElementById('flipStage').style.display='block';
+    document.getElementById('quizStage').style.display='none';
+    renderCard();
+  } else {
+    document.getElementById('flipStage').style.display='none';
+    document.getElementById('quizStage').style.display='block';
+    buildQuizPool();
+    renderQuiz();
+  }
+  updateProgress();
+}
+
+function restartAll(){
+  idx=0; quizIdx=0;
+  document.getElementById('completeScreen').style.display='none';
+  if(mode==='flip'){ document.getElementById('flipStage').style.display='block'; renderCard(); }
+  else { buildQuizPool(); document.getElementById('quizStage').style.display='block'; renderQuiz(); }
+  updateProgress();
+}
+
+function retryWrong(){
+  const ids = new Set(deck.map(c=>String(c.id)));
+  const wrongIds = Object.keys(results).filter(id=>ids.has(String(id)) && results[id]==='wrong');
+  const wrongCards = DECK.filter(c=>wrongIds.includes(String(c.id)));
+  if(wrongCards.length===0) return;
+  deck = wrongCards;
+  idx=0;
+  document.getElementById('completeScreen').style.display='none';
+  if(mode==='flip'){ document.getElementById('flipStage').style.display='block'; renderCard(); }
+  else {
+    quizPool=[...wrongCards]; quizIdx=0;
+    document.getElementById('quizStage').style.display='block';
+    renderQuiz();
+  }
+  updateProgress();
+}
+
+function speak(text){
+  if(!text) return;
+  if(!('speechSynthesis' in window)){
+    alert('이 기기에서는 음성 재생을 지원하지 않아요.');
+    return;
+  }
+  try{
+    speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'ja-JP';
+    utter.rate = 0.8;
+    speechSynthesis.speak(utter);
+  } catch(e){ /* ignore */ }
+}
+
+document.getElementById('card').addEventListener('click', flipCard);
+document.getElementById('btnKnow').addEventListener('click', (e)=>{ e.stopPropagation(); markAndAdvance(true); });
+document.getElementById('btnDontKnow').addEventListener('click', (e)=>{ e.stopPropagation(); markAndAdvance(false); });
+document.getElementById('btnPrev').addEventListener('click', goPrev);
+document.getElementById('btnNext').addEventListener('click', goNext);
+document.getElementById('btnShuffle').addEventListener('click', shuffleDeck);
+document.getElementById('modeFlip').addEventListener('click', ()=>setMode('flip'));
+document.getElementById('modeQuiz').addEventListener('click', ()=>setMode('quiz'));
+document.getElementById('quizNextBtn').addEventListener('click', nextQuiz);
+document.getElementById('btnRestartAll').addEventListener('click', restartAll);
+document.getElementById('btnRetryWrong').addEventListener('click', retryWrong);
+document.getElementById('btnResetProgress').addEventListener('click', resetAllProgress);
+document.getElementById('speakFrontBtn').addEventListener('click', (e)=>{ e.stopPropagation(); if(deck[idx]) speak(deck[idx].jp); });
+document.getElementById('speakBackBtn').addEventListener('click', (e)=>{ e.stopPropagation(); if(deck[idx]) speak(deck[idx].jp); });
+document.getElementById('speakQuizBtn').addEventListener('click', (e)=>{ e.stopPropagation(); if(quizPool[quizIdx]) speak(quizPool[quizIdx].jp); });
+
+document.addEventListener('keydown', (e)=>{
+  if(mode!=='flip') return;
+  if(e.code==='Space'){ e.preventDefault(); flipCard(); }
+  if(e.code==='ArrowRight') markAndAdvance(true);
+  if(e.code==='ArrowLeft') markAndAdvance(false);
+});
+
+renderChips();
+buildDeck();
 </script>
 </body>
 </html>
